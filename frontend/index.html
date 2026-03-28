@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bossed AI - Ace your next interview!</title>
+  <meta name="description" content="Talk with our personalised AI powered interview coach. Practice in a real-time interview and get actionable feedback. The world's most powerful AI interviewer." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --blue-light: #eff6ff;
+      --dark: #0f172a;
+      --text: #475569;
+      --muted: #64748b;
+      --bg: #ffffff;
+      --bg-gray: #f8fafc;
+      --border: #e2e8f0;
+      --green: #10b981;
+      --purple: #8b5cf6;
+      --pink: #f43f5e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ==================== NAVBAR ==================== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: 20px; color: var(--dark);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      width: 32px; height: 32px;
+      background: var(--blue);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .nav-logo span svg { width: 18px; height: 18px; fill: white; }
+
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a {
+      text-decoration: none; color: var(--text);
+      font-size: 15px; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--dark); }
+
+    .btn-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      font-weight: 600; font-size: 14px;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-dark {
+      background: var(--dark); color: #fff;
+    }
+    .btn-dark:hover { background: #000; transform: translateY(-2px); }
+
+    .btn-blue {
+      background: var(--blue); color: #fff;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.25);
+    }
+    .btn-blue:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.3); }
+
+    .btn-white {
+      background: #fff; color: var(--dark);
+      border: 1px solid var(--border);
+    }
+    .btn-white:hover { background: var(--bg-gray); transform: translateY(-2px); }
+
+    /* ==================== HERO ==================== */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 5% 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 0%, rgba(99, 102,241,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 0%, rgba(236, 72, 153, 0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 60% at 50% 100%, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 9999px; padding: 6px 14px;
+      font-size: 13px; font-weight: 600; color: var(--text);
+      margin-bottom: 28px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero h1 {
+      font-size: clamp(42px, 7vw, 80px);
+      font-weight: 800;
+      color: var(--dark);
+      letter-spacing: -2px;
+      line-height: 1.08;
+      max-width: 700px;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .hero p {
+      font-size: 18px; color: var(--text);
+      max-width: 600px; margin: 20px auto 40px;
+      font-weight: 500;
+      line-height: 1.6;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .hero-cta { animation: fadeUp 0.7s 0.3s ease both; }
+
+    /* ==================== APP MOCKUP ==================== */
+    .mockup-section {
+      padding: 0 5% 100px;
+      display: flex; justify-content: center;
+    }
+
+    .mockup-wrapper {
+      width: 100%; max-width: 920px;
+      background: linear-gradient(145deg, #f8faff, #f1f5fe);
+      border: 1px solid #e2eaff;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 20px 80px rgba(37,99,235,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mockup-bar {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .mockup-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .mockup-url {
+      flex: 1; background: #fff; border: 1px solid var(--border);
+      border-radius: 8px; padding: 4px 12px;
+      font-size: 12px; color: var(--muted); font-weight: 500;
+    }
+
+    .mockup-content {
+      background: #fff; border-radius: 16px;
+      padding: 28px; min-height: 320px;
+      display: flex; gap: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .mock-sidebar {
+      width: 200px; flex-shrink: 0;
+    }
+
+    .mock-sidebar-name {
+      font-weight: 700; font-size: 15px; color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .mock-sidebar-role {
+      font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 20px;
+    }
+
+    .mock-progress-item { margin-bottom: 12px; }
+    .mock-progress-label {
+      display: flex; justify-content: space-between;
+      font-size: 12px; font-weight: 600; color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .mock-progress-bar {
+      height: 6px; background: #e5e7eb; border-radius: 9999px; overflow: hidden;
+    }
+
+    .mock-progress-fill {
+      height: 100%; border-radius: 9999px;
+      transition: width 1s ease; 
+    }
+
+    .mock-chat { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+    .mock-msg {
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 14px; line-height: 1.6; font-weight: 500;
+      max-width: 85%;
+    }
+
+    .mock-msg-ai {
+      background: #f3f4f6;
+      color: var(--dark);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .mock-msg-user {
+      background: var(--blue);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .mock-input-row {
+      display: flex; align-items: center; gap: 10px;
+      background: #f9fafb; border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 14px;
+      margin-top: auto;
+    }
+
+    .mock-mic {
+      width: 32px; height: 32px;
+      background: var(--blue); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .mock-mic svg { width: 14px; height: 14px; fill: white; }
+
+    .mock-input-text {
+      font-size: 13px; color: var(--muted); flex: 1;
+    }
+
+    .float-badges {
+      position: absolute; top: 0; right: 0; bottom: 0;
+      pointer-events: none;
+    }
+
+    .float-badge {
+      position: absolute;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 14px;
+      font-size: 12px; font-weight: 600; color: var(--dark);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      display: flex; align-items: center; gap: 8px;
+      white-space: nowrap;
+      animation: floatBadge 3s ease-in-out infinite;
+    }
+
+    .float-badge:nth-child(1) { top: 60px; right: -60px; animation-delay: 0s; }
+    .float-badge:nth-child(2) { top: 160px; right: -80px; animation-delay: 0.8s; }
+    .float-badge:nth-child(3) { top: 260px; right: -40px; animation-delay: 1.6s; }
+
+    .float-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+
+    /* ==================== FEATURE SECTIONS ==================== */
+    .features-split { padding: 80px 5%; max-width: 1100px; margin: 0 auto; }
+
+    .feature-row {
+      display: flex; align-items: center; gap: 80px;
+      margin-bottom: 100px;
+    }
+
+    .feature-row.reverse { flex-direction: row-reverse; }
+
+    .feature-text { flex: 1; }
+    .feature-visual { flex: 1; }
+
+    .section-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #eff6ff; color: var(--blue);
+      border-radius: 9999px; padding: 5px 12px;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .feature-text h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 800; color: var(--dark);
+      letter-spacing: -1px; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .feature-text p {
+      color: var(--muted); font-size: 16px; line-height: 1.8;
+      font-weight: 400;
+    }
+
+    /* Feature card stack */
+    .card-stack { display: flex; flex-direction: column; gap: 12px; }
+
+    .stack-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 18px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      font-size: 14px; font-weight: 600; color: var(--dark);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stack-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+
+    .stack-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+
+    /* Feedback progress bars */
+    .feedback-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 20px; padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    .feedback-title {
+      font-size: 13px; font-weight: 700; color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .feedback-text {
+      font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.5;
+    }
+
+    .feedback-bar-wrap { margin-bottom: 16px; }
+    .feedback-bar-header {
+      display: flex; justify-content: space-between;
+      font-size: 13px; font-weight: 600; color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    .feedback-bar {
+      height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;
+    }
+
+    .feedback-fill {
+      height: 100%; border-radius: 9999px;
+    }
+
+    /* ==================== FEATURE GRID ==================== */
+    .feature-grid-section {
+      background: var(--bg-gray);
+      padding: 80px 5%;
+    }
+
+    .section-header {
+      text-align: center; max-width: 540px; margin: 0 auto 56px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800; color: var(--dark);
+      letter-spacing: -1px; line-height: 1.15;
+      margin-bottom: 12px;
+    }
+
+    .section-header p {
+      color: var(--muted); font-size: 16px; line-height: 1.7;
+    }
+
+    .feature-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px; max-width: 1100px; margin: 0 auto;
+    }
+
+    .feature-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+
+    .feature-card-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-size: 17px; font-weight: 700; color: var(--dark);
+      margin-bottom: 8px; letter-spacing: -0.3px;
+    }
+
+    .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* ==================== TESTIMONIALS ==================== */
+    .testimonials-section { padding: 80px 5%; }
+
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 20px; max-width: 1100px; margin: 0 auto;
+    }
+
+    .testimonial-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 20px; padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+
+    .testimonial-card:hover { transform: translateY(-3px); }
+
+    .testimonial-stars { color: #f59e0b; font-size: 16px; margin-bottom: 12px; letter-spacing: 2px; }
+
+    .testimonial-text {
+      font-size: 14px; color: var(--text);
+      line-height: 1.8; margin-bottom: 16px;
+      font-weight: 400;
+    }
+
+    .testimonial-author {
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .testimonial-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+
+    .testimonial-name { font-size: 14px; font-weight: 700; color: var(--dark); }
+    .testimonial-role { font-size: 12px; color: var(--muted); }
+
+    /* ==================== PRICING ==================== */
+    .pricing-section { background: var(--bg-gray); padding: 80px 5%; }
+
+    .pricing-grid {
+      display: flex; gap: 24px; max-width: 720px; margin: 0 auto;
+      justify-content: center; flex-wrap: wrap;
+    }
+
+    .pricing-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 24px; padding: 36px 32px;
+      flex: 1; min-width: 280px; max-width: 340px;
+      transition: transform 0.25s;
+    }
+
+    .pricing-card:hover { transform: translateY(-4px); }
+
+    .pricing-card.featured {
+      background: var(--blue); border-color: transparent;
+      box-shadow: 0 20px 60px rgba(37,99,235,0.3);
+    }
+
+    .pricing-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.7px; margin-bottom: 8px;
+    }
+
+    .pricing-label.dark { color: var(--muted); }
+    .pricing-label.white { color: rgba(255,255,255,0.7); }
+
+    .pricing-price {
+      font-size: 48px; font-weight: 900; letter-spacing: -2px;
+      line-height: 1; margin-bottom: 4px;
+    }
+
+    .pricing-price.dark { color: var(--dark); }
+    .pricing-price.white { color: #fff; }
+
+    .pricing-period {
+      font-size: 13px; margin-bottom: 24px;
+    }
+
+    .pricing-period.dark { color: var(--muted); }
+    .pricing-period.white { color: rgba(255,255,255,0.6); }
+
+    .pricing-divider {
+      height: 1px; margin: 24px 0;
+    }
+
+    .pricing-divider.dark { background: var(--border); }
+    .pricing-divider.white { background: rgba(255,255,255,0.2); }
+
+    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+    .pricing-features li {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 500;
+    }
+
+    .pricing-features li.dark { color: var(--text); }
+    .pricing-features li.white { color: rgba(255,255,255,0.9); }
+
+    .check { font-size: 16px; }
+
+    .pricing-btn-wrap { margin-top: 28px; display: flex; }
+
+    /* ==================== FAQ ==================== */
+    .faq-section { padding: 80px 5%; }
+    .faq-container { max-width: 720px; margin: 0 auto; }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-question {
+      width: 100%; background: none; border: none;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 0;
+      font-size: 16px; font-weight: 600; color: var(--dark);
+      cursor: pointer; text-align: left; gap: 16px;
+      transition: color 0.2s;
+    }
+
+    .faq-question:hover { color: var(--blue); }
+
+    .faq-icon {
+      flex-shrink: 0; width: 22px; height: 22px;
+      border: 2px solid var(--border); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--muted);
+      transition: transform 0.3s, background 0.2s;
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg); background: var(--blue);
+      border-color: var(--blue); color: #fff;
+    }
+
+    .faq-answer {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+
+    .faq-item.open .faq-answer { max-height: 200px; }
+
+    .faq-answer p {
+      padding-bottom: 20px;
+      font-size: 15px; color: var(--muted); line-height: 1.8;
+    }
+
+    /* ==================== FINAL CTA ==================== */
+    .final-cta {
+      background: var(--blue);
+      padding: 80px 5%;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 900; color: #fff;
+      letter-spacing: -1.5px; line-height: 1.1;
+      margin-bottom: 16px; max-width: 600px; margin-left: auto; margin-right: auto;
+    }
+
+    .final-cta p {
+      color: rgba(255,255,255,0.75); font-size: 16px;
+      margin-bottom: 32px;
+    }
+
+    /* ==================== FOOTER ==================== */
+    footer {
+      background: var(--bg-gray); border-top: 1px solid var(--border);
+      padding: 60px 5% 32px;
+    }
+
+    .footer-top {
+      display: flex; gap: 60px; flex-wrap: wrap; margin-bottom: 48px;
+    }
+
+    .footer-brand { flex: 1; min-width: 200px; }
+
+    .footer-brand p {
+      color: var(--muted); font-size: 14px; margin-top: 10px;
+      max-width: 240px; line-height: 1.7;
+    }
+
+    .footer-col h4 {
+      font-size: 13px; font-weight: 700; color: var(--dark);
+      text-transform: uppercase; letter-spacing: 0.7px;
+      margin-bottom: 14px;
+    }
+
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+    .footer-col ul li a {
+      text-decoration: none; color: var(--muted);
+      font-size: 14px; font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .footer-col ul li a:hover { color: var(--dark); }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border); padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 8px;
+      font-size: 13px; color: var(--muted);
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes floatBadge {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 0.7; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    .animate-on-scroll {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      .feature-row, .feature-row.reverse { flex-direction: column; gap: 40px; }
+      .mockup-content { flex-direction: column; }
+      .mock-sidebar { width: 100%; }
+      .float-badge { display: none; }
+      .pricing-grid { flex-direction: column; align-items: center; }
+      .nav-links { display: none; }
+      .footer-top { gap: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav>
+  <a href="#" class="nav-logo">
+    <span>
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+    </span>
+    Bossed
+  </a>
+  <div class="nav-links">
+    <a href="#features">Home</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+  <a href="login.html" class="btn-pill btn-dark" id="nav-login">Log in / Sign up</a>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-badge">
+    <svg width="14" height="14" fill="#2563eb" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17 5.8 21.3l2.4-7.4L2 9.4h7.6L12 2z"/></svg>
+    Voice-powered AI interview practice
+  </div>
+  <h1>Ace your next<br/>interview!</h1>
+  <p>Talk with our personalised AI powered interview coach. Practice in a real-time interview and get actionable feedback. The world's most powerful AI interviewer.</p>
+  <div class="hero-cta">
+    <a href="signup.html" class="btn-pill btn-blue" style="font-size: 16px; padding: 14px 28px;">
+      Start my interview
+      <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- ===== APP MOCKUP ===== -->
+<section class="mockup-section">
+  <div class="mockup-wrapper animate-on-scroll">
+    <div class="mockup-bar">
+      <div class="mockup-dot dot-red"></div>
+      <div class="mockup-dot dot-yellow"></div>
+      <div class="mockup-dot dot-green"></div>
+      <div class="mockup-url">app.bossed.ai/interview</div>
+    </div>
+    <div class="mockup-content">
+      <div class="mock-sidebar">
+        <div class="mock-sidebar-name">Your Interview</div>
+        <div class="mock-sidebar-role">Software Engineer – Google</div>
+        <div class="mock-progress-item">
+          <div class="mock-progress-label">
+            <span>Communication</span><span>85%</span>
+          </div>
+          <div class="mock-progress-bar">
+            <div class="mock-progress-fill" style="width:85%; background: var(--green);"></div>
+          </div>
+        </div>
+        <div class="mock-progress-item">
+          <div class="mock-progress-label">
+            <span>Cultural Fit</span><span>72%</span>
+          </div>
+          <div class="mock-progress-bar">
+            <div class="mock-progress-fill" style="width:72%; background: var(--purple);"></div>
+          </div>
+        </div>
+        <div class="mock-progress-item">
+          <div class="mock-progress-label">
+            <span>Problem Solving</span><span>90%</span>
+          </div>
+          <div class="mock-progress-bar">
+            <div class="mock-progress-fill" style="width:90%; background: var(--blue);"></div>
+          </div>
+        </div>
+      </div>
+      <div class="mock-chat">
+        <div class="mock-msg mock-msg-ai">Tell me about a time you had to solve a particularly challenging technical problem at work.</div>
+        <div class="mock-msg mock-msg-user">Sure! At my previous role, we had a production outage caused by a race condition in our distributed system...</div>
+        <div class="mock-msg mock-msg-ai">That's a strong example. How did you identify that it was specifically a race condition?</div>
+        <div class="mock-input-row">
+          <div class="mock-mic">
+            <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+          </div>
+          <div class="mock-input-text">Click microphone to speak your answer...</div>
+        </div>
+      </div>
+    </div>
+    <!-- Floating badges -->
+    <div style="position:absolute; top:80px; right:-10px; transform:rotate(3deg);" class="float-badge">
+      <div class="float-dot" style="background: var(--green);"></div>
+      CV Uploaded ✓
+    </div>
+    <div style="position:absolute; top:180px; right:10px; transform:rotate(-2deg);" class="float-badge">
+      <div class="float-dot" style="background: var(--purple);"></div>
+      Communication 85%
+    </div>
+    <div style="position:absolute; top:280px; right:-20px; transform:rotate(1deg);" class="float-badge">
+      <div class="float-dot" style="background: var(--blue);"></div>
+      Job listing imported
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURE 1 ===== -->
+<section style="padding: 30px 5%; max-width: 1100px; margin: 0 auto;">
+  <div class="feature-row animate-on-scroll">
+    <div class="feature-text">
+      <div class="section-badge">
+        <svg width="12" height="12" fill="#2563eb" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+        Personalised to you and your job
+      </div>
+      <h2>Instant personalised<br/>interviews</h2>
+      <p>Import your job from any job site, like Indeed or LinkedIn. Upload your CV. Our AI interviewer will personalise your questions, making the interview just like real life.</p>
+    </div>
+    <div class="feature-visual">
+      <div class="card-stack">
+        <div class="stack-card">
+          <div class="stack-icon" style="background: #ecfdf5;">📄</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--dark);">CV Uploaded</div>
+            <div style="font-size:12px;color:var(--muted);">John_Resume_2024.pdf · 98KB</div>
+          </div>
+          <div style="margin-left:auto;color:#22c55e;font-size:20px;">✓</div>
+        </div>
+        <div class="stack-card">
+          <div class="stack-icon" style="background: #eff6ff;">💼</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--dark);">Job Listing Imported</div>
+            <div style="font-size:12px;color:var(--muted);">Software Engineer · Google · London</div>
+          </div>
+          <div style="margin-left:auto;color:#22c55e;font-size:20px;">✓</div>
+        </div>
+        <div class="stack-card">
+          <div class="stack-icon" style="background: #fdf4ff;">⚙️</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--dark);">Set your difficulty</div>
+            <div style="font-size:12px;color:var(--muted);">Hard mode — realistic interview</div>
+          </div>
+          <div style="margin-left:auto;">
+            <div style="background:var(--blue);color:#fff;border-radius:9999px;padding:2px 10px;font-size:11px;font-weight:700;">Hard</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURE 2 -->
+  <div class="feature-row reverse animate-on-scroll">
+    <div class="feature-text">
+      <div class="section-badge">
+        <svg width="12" height="12" fill="#2563eb" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        Feedback
+      </div>
+      <h2>Get actionable,<br/>constructive feedback</h2>
+      <p>We give you actionable constructive feedback, so you can improve your interview technique. Work your way up from easy mode to hard mode to perfect your answers.</p>
+    </div>
+    <div class="feature-visual">
+      <div class="feedback-card">
+        <div class="feedback-title">Interview Performance Report</div>
+        <div class="feedback-text">Well articulated answers with strong technical depth. Focus on your STAR method.</div>
+
+        <div class="feedback-bar-wrap">
+          <div class="feedback-bar-header"><span>Communication</span><span style="color:var(--green);">85%</span></div>
+          <div class="feedback-bar"><div class="feedback-fill" style="width:85%;background:var(--green);"></div></div>
+        </div>
+        <div class="feedback-bar-wrap">
+          <div class="feedback-bar-header"><span>Cultural Fit</span><span style="color:var(--purple);">72%</span></div>
+          <div class="feedback-bar"><div class="feedback-fill" style="width:72%;background:var(--purple);"></div></div>
+        </div>
+        <div class="feedback-bar-wrap">
+          <div class="feedback-bar-header"><span>Problem Solving</span><span style="color:var(--blue);">90%</span></div>
+          <div class="feedback-bar"><div class="feedback-fill" style="width:90%;background:var(--blue);"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURE GRID ===== -->
+<section class="feature-grid-section">
+  <div class="section-header animate-on-scroll">
+    <div class="section-badge" style="margin-bottom:12px;">Everything you need</div>
+    <h2>Why candidates love Bossed</h2>
+    <p>Everything you need to nail your next interview and land the job you've always wanted.</p>
+  </div>
+  <div class="feature-grid">
+    <div class="feature-card animate-on-scroll" style="animation-delay:0.05s">
+      <div class="feature-card-icon" style="background:#eff6ff;">🎤</div>
+      <h3>Realistic voice chat</h3>
+      <p>Our realistic voice chat feels just like a real interview. Practice speaking confidently under pressure.</p>
+    </div>
+    <div class="feature-card animate-on-scroll" style="animation-delay:0.1s">
+      <div class="feature-card-icon" style="background:#fdf4ff;">🔍</div>
+      <h3>Find holes in your CV</h3>
+      <p>Our AI interviewer will question you on everything from job-specific technicalities to items on your résumé.</p>
+    </div>
+    <div class="feature-card animate-on-scroll" style="animation-delay:0.15s">
+      <div class="feature-card-icon" style="background:#f0fdf4;">💬</div>
+      <h3>Constructive feedback</h3>
+      <p>Get honest, constructive feedback from our intelligent interview model to sharpen your technique.</p>
+    </div>
+    <div class="feature-card animate-on-scroll" style="animation-delay:0.2s">
+      <div class="feature-card-icon" style="background:#fff7ed;">📈</div>
+      <h3>Level up over time</h3>
+      <p>Work your way up from easy to hard mode, mastering your interview technique at every step.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="testimonials-section">
+  <div class="section-header animate-on-scroll">
+    <h2>Loved by job seekers</h2>
+    <p>Thousands of candidates have used Bossed to practise and land their dream roles.</p>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card animate-on-scroll">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"Bossed really put me through my paces. The AI interviewer asked incredibly specific questions about my CV that I hadn't been prepared for. Now I feel confident in any interview room."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:#7DDAA4;">K</div>
+        <div>
+          <div class="testimonial-name">Katya Samson</div>
+          <div class="testimonial-role">Dentist, NHS Trust</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card animate-on-scroll">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"I practised for 3 days before my Google interview using Bossed. The feedback on my communication style was spot on. Got the offer! Absolutely recommend."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:#CC8CFD;">J</div>
+        <div>
+          <div class="testimonial-name">James Okafor</div>
+          <div class="testimonial-role">Software Engineer, Google</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card animate-on-scroll">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"As someone who gets anxious during interviews, Bossed helped me build genuine confidence. The voice-based practice was a game-changer."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:#FF908F;">S</div>
+        <div>
+          <div class="testimonial-name">Sofia Martinez</div>
+          <div class="testimonial-role">Product Manager, Meta</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRICING ===== -->
+<section class="pricing-section" id="pricing">
+  <div class="section-header animate-on-scroll">
+    <h2>Simple, transparent pricing</h2>
+    <p>Start for free, upgrade when you're ready to go all-in on your job search.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="pricing-card animate-on-scroll">
+      <div class="pricing-label dark">Free plan</div>
+      <div class="pricing-price dark">$0</div>
+      <div class="pricing-period dark">forever free</div>
+      <div class="pricing-divider dark"></div>
+      <ul class="pricing-features">
+        <li class="dark"><span class="check">✓</span> 1 free interview per day</li>
+        <li class="dark"><span class="check">✓</span> Basic CV personalisation</li>
+        <li class="dark"><span class="check">✓</span> Auto job import</li>
+        <li class="dark"><span class="check">✓</span> Performance feedback</li>
+      </ul>
+      <div class="pricing-btn-wrap">
+        <a href="#" class="btn-pill btn-white" style="width:100%;justify-content:center;">Get started free →</a>
+      </div>
+    </div>
+    <div class="pricing-card featured animate-on-scroll">
+      <div class="pricing-label white">Unlimited plan</div>
+      <div class="pricing-price white">$19.99</div>
+      <div class="pricing-period white">per week · cancel anytime</div>
+      <div class="pricing-divider white"></div>
+      <ul class="pricing-features">
+        <li class="white"><span class="check">✓</span> Unlimited interviews</li>
+        <li class="white"><span class="check">✓</span> All difficulty levels</li>
+        <li class="white"><span class="check">✓</span> Deep CV analysis</li>
+        <li class="white"><span class="check">✓</span> Priority AI model</li>
+        <li class="white"><span class="check">✓</span> Stripe secured payments</li>
+      </ul>
+      <div class="pricing-btn-wrap">
+        <a href="#" class="btn-pill" style="background:#fff;color:var(--blue);font-weight:700;width:100%;justify-content:center;">Start unlimited →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="faq-section">
+  <div class="section-header animate-on-scroll">
+    <h2>Frequently asked questions</h2>
+  </div>
+  <div class="faq-container">
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        What is Bossed?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p>Bossed is an AI-powered interview practice platform. You can upload your CV, import a job listing, and our AI interviewer will conduct a personalised, realistic interview session with you via voice chat.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        How do I personalise my interview?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p>Simply upload your CV and paste the URL or text from any job listing (Indeed, LinkedIn, etc.). Our AI will analyse both and create a personalised question set tailored to your background and target role.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        What is the unlimited plan?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p>For $19.99/week you get unlimited interview sessions across all difficulty modes — Easy, Medium, and Hard. Cancel any time, no questions asked. Payments are securely processed through Stripe.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Is my data safe?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p>Yes. We take your data security seriously. All data is encrypted in transit and at rest. We never sell your personal information to third parties. Read our Privacy Policy for full details.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        How can I cancel?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p>You can cancel your subscription at any time from your account settings. Your access will continue until the end of the billing period. No hidden fees or tricky cancellation flows.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FINAL CTA ===== -->
+<section class="final-cta">
+  <h2>Get the job of your dreams</h2>
+  <p>Start practising for your interview now! It's free to get started.</p>
+  <a href="#" class="btn-pill btn-white" style="font-size:16px;padding:14px 32px;display:inline-flex;">
+    Start for free →
+  </a>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo" style="text-decoration:none;">
+        <span>
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+        </span>
+        Bossed
+      </a>
+      <p>The world's most powerful AI interview coach. Practice, improve, and land your dream job.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Pages</h4>
+      <ul>
+        <li><a href="#">Homepage</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#">Log in</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="#">Support</a></li>
+        <li><a href="#">hello@bossed.ai</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>Bossed AI 2024</span>
+    <span>All rights reserved</span>
+  </div>
+</footer>
+
+<script>
+  // FAQ Toggle
+  function toggleFaq(btn) {
+    const item = btn.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Log In — Bossed AI</title>
+  <meta name="description" content="Log in to Bossed AI and continue your AI-powered interview practice." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --blue-light: #eff6ff;
+      --dark: #0f172a;
+      --text: #475569;
+      --muted: #64748b;
+      --bg: #ffffff;
+      --bg-gray: #f8fafc;
+      --border: #e2e8f0;
+      --error: #ef4444;
+      --success: #10b981;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gray);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== NAVBAR ===== */
+    nav {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: 18px; color: var(--dark);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 30px; height: 30px;
+      background: var(--blue);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .logo-icon svg { width: 16px; height: 16px; fill: white; }
+
+    .nav-link {
+      font-size: 14px; font-weight: 500; color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--dark); }
+
+    /* ===== MAIN LAYOUT ===== */
+    main {
+      flex: 1; display: flex;
+      align-items: center; justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .auth-wrapper {
+      width: 100%; max-width: 440px;
+      animation: slideUp 0.5s ease both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 36px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+    }
+
+    .auth-header { text-align: center; margin-bottom: 28px; }
+
+    .auth-logo {
+      display: inline-flex; align-items: center; gap: 8px;
+      text-decoration: none; margin-bottom: 20px;
+    }
+
+    .auth-header h1 {
+      font-size: 24px; font-weight: 800;
+      color: var(--dark); margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .auth-header p {
+      font-size: 14px; color: var(--muted); font-weight: 400;
+    }
+
+    /* ===== GOOGLE BUTTON ===== */
+    .btn-google {
+      width: 100%; display: flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 12px 20px;
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: 12px; font-size: 15px; font-weight: 600;
+      color: var(--dark); cursor: pointer;
+      transition: all 0.2s; text-decoration: none;
+    }
+
+    .btn-google:hover {
+      background: var(--bg-gray);
+      border-color: #d1d5db;
+      transform: scale(1.01);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+
+    .btn-google:active { transform: scale(0.99); }
+
+    .google-icon { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ===== DIVIDER ===== */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0;
+    }
+
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+
+    .divider span {
+      font-size: 12px; font-weight: 600;
+      color: var(--muted); white-space: nowrap;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    /* ===== FORM ===== */
+    .form-group { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 13px; font-weight: 600; color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px; font-family: 'Inter', sans-serif;
+      color: var(--dark); background: #fff;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+    }
+
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    input.error { border-color: var(--error); }
+    input.error:focus { box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+
+    .form-error {
+      font-size: 12px; color: var(--error); font-weight: 500;
+      margin-top: 4px; display: none;
+    }
+
+    .form-error.visible { display: block; }
+
+    /* ===== FORGOT PASSWORD ===== */
+    .forgot-link {
+      display: block; text-align: right;
+      font-size: 12px; font-weight: 600;
+      color: var(--blue); text-decoration: none;
+      margin-top: -8px; margin-bottom: 16px;
+      transition: opacity 0.2s;
+    }
+    .forgot-link:hover { opacity: 0.8; }
+
+    /* ===== SUBMIT BUTTON ===== */
+    .btn-submit {
+      width: 100%; padding: 13px 20px;
+      background: var(--blue); color: #fff;
+      border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .btn-submit:hover {
+      background: var(--blue-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37,99,235,0.3);
+    }
+
+    .btn-submit:active { transform: scale(0.99); }
+
+    .btn-submit.loading { pointer-events: none; opacity: 0.8; }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-text { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== ALERT ===== */
+    .alert {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px; font-weight: 500;
+      margin-bottom: 18px;
+      display: none; align-items: center; gap: 8px;
+    }
+
+    .alert.visible { display: flex; }
+
+    .alert-error {
+      background: #fef2f2; color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+      background: #f0fdf4; color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    /* ===== SWITCH AUTH ===== */
+    .auth-switch {
+      text-align: center; margin-top: 20px;
+      font-size: 14px; color: var(--muted);
+    }
+
+    .auth-switch a {
+      color: var(--blue); font-weight: 700;
+      text-decoration: none;
+    }
+    .auth-switch a:hover { text-decoration: underline; }
+
+    /* ===== TERMS ===== */
+    .terms-text {
+      text-align: center; margin-top: 16px;
+      font-size: 11px; color: var(--muted); line-height: 1.6;
+    }
+
+    .terms-text a { color: var(--muted); text-decoration: underline; }
+
+    /* ===== SOCIAL PROOF ===== */
+    .social-proof {
+      text-align: center; margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .proof-avatars {
+      display: flex; justify-content: center; margin-bottom: 8px;
+    }
+
+    .proof-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+      margin-left: -8px;
+    }
+
+    .proof-avatar:first-child { margin-left: 0; }
+
+    .proof-text {
+      font-size: 13px; color: var(--muted); font-weight: 500;
+    }
+
+    .proof-text strong { color: var(--dark); }
+
+    /* Password strength bar */
+    .password-strength { margin-top: 6px; display: none; }
+    .password-strength.visible { display: block; }
+    .strength-bar {
+      height: 3px; background: var(--border);
+      border-radius: 9999px; overflow: hidden; margin-bottom: 4px;
+    }
+    .strength-fill {
+      height: 100%; border-radius: 9999px;
+      transition: width 0.3s, background 0.3s;
+      width: 0;
+    }
+    .strength-label {
+      font-size: 11px; font-weight: 600;
+    }
+
+    /* ===== PASSWORD TOGGLE ===== */
+    .input-wrapper { position: relative; }
+    .input-wrapper input { padding-right: 42px; }
+    .pwd-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); padding: 0;
+      display: flex; align-items: center;
+    }
+    .pwd-toggle:hover { color: var(--dark); }
+    .pwd-toggle svg { width: 18px; height: 18px; }
+
+    @media (max-width: 480px) {
+      .auth-card { padding: 28px 20px; border-radius: 16px; }
+    }
+
+    /* ===== GOOGLE MODAL ===== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+      z-index: 9999; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal-box {
+      background: #fff; border-radius: 20px;
+      padding: 32px 28px; max-width: 420px; width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      transform: scale(0.95);
+      transition: transform 0.25s;
+    }
+    .modal-overlay.open .modal-box { transform: scale(1); }
+
+    .modal-icon { font-size: 36px; text-align: center; margin-bottom: 12px; }
+
+    .modal-box h2 {
+      font-size: 18px; font-weight: 800; color: var(--dark);
+      text-align: center; margin-bottom: 8px;
+    }
+
+    .modal-box p {
+      font-size: 13px; color: var(--muted); text-align: center;
+      line-height: 1.7; margin-bottom: 20px;
+    }
+
+    .modal-steps {
+      background: var(--bg-gray); border-radius: 12px;
+      padding: 16px; margin-bottom: 20px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .modal-step {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 13px; color: var(--text);
+    }
+
+    .step-num {
+      width: 20px; height: 20px; flex-shrink: 0;
+      background: var(--blue); color: #fff;
+      border-radius: 50%; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .modal-input {
+      width: 100%; padding: 10px 12px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 13px; font-family: 'Inter', sans-serif;
+      outline: none; transition: border-color 0.2s;
+      margin-bottom: 12px;
+    }
+    .modal-input:focus { border-color: var(--blue); }
+    .modal-input::placeholder { color: var(--muted); }
+
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-btn-cancel {
+      flex: 1; padding: 10px;
+      border: 1.5px solid var(--border); background: #fff;
+      border-radius: 10px; font-size: 14px; font-weight: 600;
+      cursor: pointer; color: var(--text); transition: background 0.2s;
+    }
+    .modal-btn-cancel:hover { background: var(--bg-gray); }
+    .modal-btn-apply {
+      flex: 1; padding: 10px;
+      background: var(--blue); color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .modal-btn-apply:hover { background: #1d4ed8; }
+
+    .modal-link {
+      display: block; text-align: center; margin-top: 10px;
+      font-size: 12px; color: var(--blue); text-decoration: none;
+    }
+    .modal-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+    </div>
+    Bossed
+  </a>
+  <a href="signup.html" class="nav-link">Don't have an account? <strong style="color:var(--blue)">Sign up</strong></a>
+</nav>
+
+<main>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+
+      <div class="auth-header">
+        <h1>Welcome back 👋</h1>
+        <p>Sign in to continue your interview preparation</p>
+      </div>
+
+      <!-- Alert Box -->
+      <div class="alert alert-error" id="alert-error">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <span id="alert-error-text">Invalid email or password.</span>
+      </div>
+
+      <!-- Google Sign In -->
+      <a href="#" class="btn-google" id="btn-google" onclick="handleGoogleLogin(event)">
+        <svg class="google-icon" viewBox="0 0 48 48">
+          <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+          <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,19.000,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+          <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+          <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+        </svg>
+        Continue with Google
+      </a>
+      <!-- Hidden container for Google One-Tap fallback -->
+      <div id="google-btn-container" style="display:none;"></div>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span>or continue with email</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" onsubmit="handleLogin(event)" novalidate>
+
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
+          <div class="form-error" id="email-error">Please enter a valid email address.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" />
+            <button type="button" class="pwd-toggle" onclick="togglePassword('password', this)" aria-label="Show password">
+              <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="form-error" id="password-error">Password is required.</div>
+        </div>
+
+        <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+
+        <button type="submit" class="btn-submit" id="login-btn">
+          <div class="spinner"></div>
+          <span class="btn-text">Sign in →</span>
+        </button>
+      </form>
+
+      <!-- Social proof -->
+      <div class="social-proof">
+        <div class="proof-avatars">
+          <div class="proof-avatar" style="background:#7DDAA4;">K</div>
+          <div class="proof-avatar" style="background:#CC8CFD;">J</div>
+          <div class="proof-avatar" style="background:#FF908F;">S</div>
+          <div class="proof-avatar" style="background:#2563eb;">M</div>
+          <div class="proof-avatar" style="background:#f59e0b;">A</div>
+        </div>
+        <p class="proof-text">Join <strong>10,000+</strong> candidates practising daily</p>
+      </div>
+
+    </div>
+
+    <div class="auth-switch">
+      New to Bossed? <a href="signup.html">Create your free account &rarr;</a>
+    </div>
+
+    <p class="terms-text">
+      By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+    </p>
+  </div>
+</main>
+
+<!-- ===== GOOGLE CLIENT ID SETUP MODAL ===== -->
+<div class="modal-overlay" id="google-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🔑</div>
+    <h2>Set Up Google Sign-In</h2>
+    <p>Enter your Google OAuth Client ID to enable one-click sign-in. It only takes 2 minutes to get one.</p>
+
+    <div class="modal-steps">
+      <div class="modal-step">
+        <div class="step-num">1</div>
+        <div>Go to <strong>console.cloud.google.com</strong> → APIs &amp; Services → Credentials</div>
+      </div>
+      <div class="modal-step">
+        <div class="step-num">2</div>
+        <div>Click <strong>Create Credentials</strong> → OAuth Client ID → Web application</div>
+      </div>
+      <div class="modal-step">
+        <div class="step-num">3</div>
+        <div>Add <strong>http://localhost:3001</strong> to Authorised JavaScript origins</div>
+      </div>
+      <div class="modal-step">
+        <div class="step-num">4</div>
+        <div>Copy your <strong>Client ID</strong> and paste it below</div>
+      </div>
+    </div>
+
+    <input type="text" class="modal-input" id="client-id-input"
+      placeholder="e.g. 123456789-abc.apps.googleusercontent.com" />
+
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeGoogleModal()">Not now</button>
+      <button class="modal-btn-apply" onclick="applyClientId()">Apply &amp; Sign in with Google</button>
+    </div>
+    <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="modal-link">
+      → Open Google Cloud Console
+    </a>
+  </div>
+</div>
+
+<script>
+  function togglePassword(fieldId, btn) {
+    const input = document.getElementById(fieldId);
+    const isText = input.type === 'text';
+    input.type = isText ? 'password' : 'text';
+    btn.innerHTML = isText
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+  }
+
+  function showError(message) {
+    const alert = document.getElementById('alert-error');
+    document.getElementById('alert-error-text').textContent = message;
+    alert.classList.add('visible');
+    setTimeout(() => alert.classList.remove('visible'), 5000);
+  }
+
+  function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    let valid = true;
+
+    const emailEl = document.getElementById('email');
+    const passwordEl = document.getElementById('password');
+    const emailErr = document.getElementById('email-error');
+    const passErr = document.getElementById('password-error');
+
+    // Reset errors
+    emailEl.classList.remove('error'); emailErr.classList.remove('visible');
+    passwordEl.classList.remove('error'); passErr.classList.remove('visible');
+
+    if (!validateEmail(emailEl.value)) {
+      emailEl.classList.add('error'); emailErr.classList.add('visible');
+      valid = false;
+    }
+    if (!passwordEl.value) {
+      passwordEl.classList.add('error'); passErr.classList.add('visible');
+      valid = false;
+    }
+    if (!valid) return;
+
+    const btn = document.getElementById('login-btn');
+    btn.classList.add('loading');
+
+    // Simulate a brief network delay then log in locally
+    // (This is a static demo — to connect your FastAPI backend,
+    //  uncomment the fetch block below and point it to port 8000)
+    await new Promise(r => setTimeout(r, 900));
+
+    // ---- Connect to real FastAPI backend (port 8000) ----
+    try {
+      const res = await fetch('http://localhost:8000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailEl.value, password: passwordEl.value })
+      });
+      if (!res.ok) { 
+        const d = await res.json().catch(()=>({})); 
+        throw new Error(d.detail || 'Invalid credentials'); 
+      }
+      const data = await res.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user_name', data.user_name);
+    } catch (err) { 
+      showError(err.message); 
+      btn.classList.remove('loading'); 
+      return; 
+    }
+    // -------------------------------------------------------
+
+    localStorage.setItem('user_email', emailEl.value);
+    localStorage.setItem('auth_method', 'email');
+
+    showSuccessAlert('Signed in as <strong>' + emailEl.value + '</strong> ✓ Redirecting...');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1600);
+  }
+
+  // ===== GOOGLE OAUTH =====
+  const GOOGLE_CLIENT_ID = '489992751522-sjou3spm6b3aviomffve4oooarb4j1js.apps.googleusercontent.com';
+  let gisReady = false;
+
+  // Initialize GIS ONCE when the SDK script finishes loading
+  function onGoogleScriptLoad() {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: true,
+      use_fedcm_for_prompt: true,   // opt-in to FedCM to suppress warnings
+    });
+    gisReady = true;
+  }
+
+  // Poll for google SDK (it loads async)
+  (function waitForGoogle() {
+    if (window.google && window.google.accounts) {
+      onGoogleScriptLoad();
+    } else {
+      setTimeout(waitForGoogle, 150);
+    }
+  })();
+
+  function handleGoogleLogin(e) {
+    e.preventDefault();
+    if (!gisReady) {
+      showError('Google SDK is still loading. Please try again in a moment.');
+      return;
+    }
+    const customBtn = document.getElementById('btn-google');
+    const container = document.getElementById('google-btn-container');
+
+    // Use google.accounts.oauth2 popup flow via renderButton as primary approach
+    // (One Tap / FedCM prompt is the secondary browser-UI approach)
+    google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        // FedCM/One Tap was blocked or skipped — fall back to rendered button
+        customBtn.style.display = 'none';
+        container.style.display = 'flex';
+        container.style.justifyContent = 'center';
+        container.style.marginTop = '8px';
+        container.style.minHeight = '44px';
+        google.accounts.id.renderButton(container, {
+          type: 'standard',
+          theme: 'outline',
+          size: 'large',
+          width: Math.min(368, container.parentElement.offsetWidth - 0),
+          text: 'signin_with',
+        });
+      }
+    });
+  }
+
+  async function handleGoogleCredential(response) {
+    let name = '', email = '';
+    try {
+      const payload = JSON.parse(atob(response.credential.split('.')[1]));
+      name = payload.name || payload.given_name || '';
+      email = payload.email || '';
+    } catch (_) {}
+
+    // Store locally (no backend POST needed for this static clone)
+    localStorage.setItem('google_token', response.credential);
+    localStorage.setItem('user_name', name);
+    localStorage.setItem('user_email', email);
+    localStorage.setItem('auth_method', 'google');
+
+    // --- Uncomment to connect to FastAPI backend on port 8000 ---
+    // try {
+    //   const res = await fetch('http://localhost:8000/api/auth/google-token', {
+    //     method: 'POST', headers: {'Content-Type':'application/json'},
+    //     body: JSON.stringify({ token: response.credential })
+    //   });
+    //   if (!res.ok) throw new Error();
+    //   const data = await res.json();
+    //   localStorage.setItem('token', data.access_token);
+    // } catch { showError('Backend auth failed.'); return; }
+    // ------------------------------------------------------------
+
+    showSuccessAlert('Signed in as <strong>' + (name || email) + '</strong> &nbsp;✓&nbsp; Redirecting...');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+  }
+
+  function showSuccessAlert(html) {
+    const box = document.getElementById('alert-error');
+    box.className = 'alert alert-success visible';
+    box.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span>${html}</span>`;
+  }
+
+  document.getElementById('google-modal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+</script>
+</body>
+</html>

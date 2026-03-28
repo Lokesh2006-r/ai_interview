@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — Bossed AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --blue-light: #eff6ff;
+      --bg: #ffffff;
+      --bg-gray: #f8fafc;
+      --bg-card: #ffffff;
+      --text: #374151;
+      --text-dark: #111827;
+      --muted: #6b7280;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --sidebar-width: 260px;
+      --sidebar-bg: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      --bg: #09090b;
+      --bg-gray: #020617;
+      --bg-card: #111827;
+      --sidebar-bg: #0f172a;
+      --text: #94a3b8;
+      --text-dark: #f8fafc;
+      --muted: #64748b;
+      --border: #1e293b;
+      --blue-light: rgba(37, 99, 235, 0.1);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gray);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ===== SIDEBAR ===== */
+    aside {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      height: 100vh;
+      display: flex; flex-direction: column;
+      position: fixed; left: 0; top: 0;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 18px; color: var(--text-dark);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 28px; height: 28px; background: var(--blue);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-icon svg { width: 14px; height: 14px; fill: #fff; }
+
+    .nav-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
+    
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border-radius: 10px;
+      text-decoration: none; font-size: 14px; font-weight: 500;
+      color: var(--muted); transition: all 0.2s;
+    }
+
+    .nav-item:hover { background: var(--blue-light); color: var(--blue); }
+    .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 600; }
+    
+    .nav-item svg { width: 18px; height: 18px; opacity: 0.7; }
+    .nav-item.active svg { opacity: 1; }
+
+    .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); }
+    
+    .user-pill {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px; border-radius: 12px; background: var(--bg-gray);
+      text-decoration: none; color: var(--dark); font-size: 13px; font-weight: 600;
+    }
+    .user-pill img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+
+    /* ===== MAIN CONTENT ===== */
+    main {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 32px 40px;
+      display: flex; flex-direction: column; gap: 32px;
+    }
+
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .greeting h1 { font-size: 24px; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+    .greeting p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    
+    .btn-upgrade {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text-dark); font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: 0.2s;
+    }
+    .btn-upgrade:hover { background: var(--bg-gray); }
+
+    /* ===== DASHBOARD CARDS ===== */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .hero-card {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      border-radius: 24px; padding: 40px; color: #fff;
+      display: flex; flex-direction: column; justify-content: space-between;
+      position: relative; overflow: hidden;
+      box-shadow: 0 10px 40px rgba(30, 27, 75, 0.15);
+    }
+    [data-theme="dark"] .hero-card { background: linear-gradient(135deg, #2563eb 0%, #1e1b4b 100%); }
+    
+    .hero-card-pattern {
+      position: absolute; right: -20px; bottom: -20px;
+      width: 240px; height: 240px; background: rgba(255,255,255,0.05);
+      border-radius: 50%; pointer-events: none;
+    }
+
+    .hero-card h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+    .hero-card p { font-size: 15px; color: rgba(255,255,255,0.7); max-width: 400px; line-height: 1.6; }
+    
+    .btn-start {
+      margin-top: 32px; display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 28px; background: #fff; color: #1e1b4b;
+      border-radius: 14px; font-size: 15px; font-weight: 700;
+      text-decoration: none; transition: all 0.2s; width: fit-content;
+    }
+    .btn-start:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+
+    .stats-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+      padding: 24px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .stats-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .stats-card-header span { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--blue-light); color: var(--blue); display: flex; align-items: center; justify-content: center; }
+
+    .stats-value { font-size: 32px; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
+    .stats-diff { font-size: 12px; font-weight: 600; color: var(--success); display: flex; align-items: center; gap: 4px; }
+
+    /* ===== INTERVIEW LIST ===== */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .section-header h3 { font-size: 18px; font-weight: 700; color: var(--text-dark); }
+    .section-link { font-size: 13px; font-weight: 600; color: var(--blue); text-decoration: none; }
+
+    .interview-list { display: flex; flex-direction: column; gap: 12px; }
+    
+    .interview-row {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .interview-row:hover { border-color: var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+
+    .role-info { display: flex; align-items: center; gap: 16px; }
+    .comp-logo { width: 44px; height: 44px; border-radius: 12px; background: var(--bg-gray); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: var(--muted); border: 1px solid var(--border); }
+    
+    .role-details h4 { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+    .role-details p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .theme-icon-btn {
+      width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--bg-card); color: var(--text-dark);
+      cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    }
+    .theme-icon-btn:hover { background: var(--bg-gray); border-color: var(--blue); transform: translateY(-2px); }
+    .theme-icon-btn svg { width: 18px; height: 18px; }
+
+    .score-badge {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    }
+    .score-val { font-size: 16px; font-weight: 700; color: var(--blue); }
+    .score-date { font-size: 11px; font-weight: 500; color: var(--muted); }
+
+    /* Sidebar icons size */
+    .icon { width: 18px; height: 18px; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .hero-card { grid-column: span 1; }
+    }
+
+    @media (max-width: 768px) {
+      aside { transform: translateX(-100%); transition: transform 0.3s; }
+      aside.open { transform: translateX(0); }
+      main { margin-left: 0; padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<aside>
+  <div class="sidebar-header">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+    </div>
+    Bossed
+  </div>
+
+  <nav class="nav-list">
+    <a href="dashboard.html" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </a>
+    <a href="dashboard.html#recent-simulations" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+      Interviews
+    </a>
+    <a href="intelligence.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      Intelligence
+    </a>
+    <a href="resume-lab.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Resume Lab
+    </a>
+    <a href="resume-builder.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+      Resume Builder
+    </a>
+    <a href="pricing.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Pricing
+    </a>
+    <div style="flex:1;"></div>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </a>
+    <a href="login.html" class="nav-item" style="color:var(--error);" onclick="localStorage.clear()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Log Out
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="#" class="user-pill">
+      <img src="https://ui-avatars.com/api/?name=User&background=eff6ff&color=2563eb&bold=true" id="user-avatar" alt="User" />
+      <div style="overflow:hidden; text-overflow:ellipsis;">
+        <span id="user-name" style="color:var(--text-dark);">User Name</span><br/>
+        <span style="font-size:11px; color:var(--muted); font-weight:400;">Free Plan</span>
+      </div>
+    </a>
+  </div>
+</aside>
+
+<main>
+  <header class="top-bar">
+    <div class="greeting">
+      <h1>Hello, <span id="user-firstname">Lokesh</span>! 👋</h1>
+      <p>Master your interview presence today.</p>
+    </div>
+    <div class="header-actions">
+      <button class="theme-icon-btn" id="theme-toggle" title="Toggle Theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+      <div style="background:var(--border); width:1px; height:24px;"></div>
+      <a href="#" class="btn-upgrade">✨ Upgrade to Pro</a>
+      <button style="background:none; border:none; color:var(--muted); cursor:pointer;">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="dashboard-grid">
+    <div class="hero-card">
+      <div class="hero-card-pattern"></div>
+      <div>
+        <h2>Ready for your next<br/>big interview?</h2>
+        <p>Start a realistic AI-powered simulation tailored to your target company and role. Get instant feedback on your tone, content, and confidence.</p>
+      </div>
+      <a href="#" class="btn-start" onclick="startNewInterview()">
+        Start New Simulation &rarr;
+      </a>
+    </div>
+
+    <div class="stats-card">
+      <div class="stats-card-header">
+        <span>Average Score</span>
+        <div class="status-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17 5.8 21.3l2.4-7.4L2 9.4h7.6L12 2z"/></svg></div>
+      </div>
+      <div>
+        <div class="stats-value">78%</div>
+        <div class="stats-diff">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+          +4% from last week
+        </div>
+      </div>
+      <div style="margin-top:20px; height:4px; background:var(--bg-gray); border-radius:2px; overflow:hidden;">
+        <div style="width:78%; height:100%; background:var(--blue); border-radius:2px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-header" id="recent-simulations">
+      <h3>Recent Simulations</h3>
+      <a href="#" class="section-link">View all history &rarr;</a>
+    </div>
+    
+    <div class="interview-list" id="interview-list">
+      <!-- Item 1 -->
+      <div class="interview-row">
+        <div class="role-info">
+          <div class="comp-logo" style="background:#000; color:#fff;">G</div>
+          <div class="role-details">
+            <h4>Google — Software Engineer</h4>
+            <p>Behavioural & Technical • 15 mins</p>
+          </div>
+        </div>
+        <div class="score-badge">
+          <div class="score-val">82/100</div>
+          <div class="score-date">Yesterday, 14:20</div>
+        </div>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="interview-row">
+        <div class="role-info">
+          <div class="comp-logo" style="background:#fff; color:#0e76a8;">in</div>
+          <div class="role-details">
+            <h4>LinkedIn — Product Manager</h4>
+            <p>Product Strategy • 12 mins</p>
+          </div>
+        </div>
+        <div class="score-badge">
+          <div class="score-val">74/100</div>
+          <div class="score-date">2 days ago, 11:05</div>
+        </div>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="interview-row">
+        <div class="role-info">
+          <div class="comp-logo" style="background:#5865F2; color:#fff;">D</div>
+          <div class="role-details">
+            <h4>Discord — Frontend Developer</h4>
+            <p>React & CSS • 20 mins</p>
+          </div>
+        </div>
+        <div class="score-badge">
+            <div style="font-size:12px; font-weight:600; color:var(--muted);">In Progress</div>
+            <div class="score-date">Mar 25, 09:45</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+    <div class="stats-card">
+        <div class="stats-card-header"><span>Clarity Score</span></div>
+        <div class="stats-value" style="color:var(--success);">High</div>
+        <p style="font-size:12px; color:var(--muted);">Your articulation is clear and professional.</p>
+    </div>
+    <div class="stats-card">
+        <div class="stats-card-header"><span>Filler Words</span></div>
+        <div class="stats-value" style="color:var(--warning);">82</div>
+        <p style="font-size:12px; color:var(--muted);">You use "um" and "like" frequently. Aim for <50.</p>
+    </div>
+  </div>
+</main>
+
+<script>
+  // Auth & Theme Check
+  window.addEventListener('load', () => {
+    // Apply Theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeUI(savedTheme);
+
+    const userEmail = localStorage.getItem('user_email');
+    const storedName = localStorage.getItem('user_name');
+    
+    let displayName = storedName || 'Guest User';
+    
+    // If the name looks like an email, extract the part before @
+    if (displayName.includes('@')) {
+      displayName = displayName.split('@')[0];
+      // Capitalize first letter
+      displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+    }
+
+    if (userEmail || localStorage.getItem('google_token')) {
+      document.getElementById('user-name').textContent = displayName;
+      
+      // Get first name for greeting
+      const firstName = displayName.split(' ')[0];
+      document.getElementById('user-firstname').textContent = firstName;
+      
+      document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=eff6ff&color=2563eb&bold=true`;
+    }
+  });
+
+  // Theme Toggle Logic
+  const themeToggle = document.getElementById('theme-toggle');
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeUI(newTheme);
+  });
+
+  function updateThemeUI(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (theme === 'dark') {
+      icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>';
+    } else {
+      icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    }
+  }
+
+  function startNewInterview() {
+    window.location.href = 'simulator.html';
+  }
+</script>
+
+</body>
+</html>

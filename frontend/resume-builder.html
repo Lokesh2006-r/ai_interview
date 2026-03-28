@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume Builder — Bossed AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --blue-light: #eff6ff;
+      --bg: #ffffff;
+      --bg-gray: #f8fafc;
+      --bg-card: #ffffff;
+      --text: #475569;
+      --text-dark: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --sidebar-width: 260px;
+      --sidebar-bg: #ffffff;
+      --resume-header-bg: #333333;
+    }
+
+    [data-theme="dark"] {
+      --bg: #09090b;
+      --bg-gray: #020617;
+      --bg-card: #111827;
+      --sidebar-bg: #0f172a;
+      --text: #94a3b8;
+      --text-dark: #f8fafc;
+      --muted: #64748b;
+      --border: #1e293b;
+      --blue-light: rgba(37, 99, 235, 0.1);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gray);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
+    }
+
+    /* ===== SIDEBAR ===== */
+    aside {
+      width: var(--sidebar-width); background: var(--sidebar-bg); border-right: 1px solid var(--border);
+      height: 100vh; display: flex; flex-direction: column;
+      position: fixed; left: 0; top: 0; z-index: 100;
+      transition: background 0.3s, border 0.3s;
+    }
+    .sidebar-header { padding: 24px 20px; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--text-dark); text-decoration: none; }
+    .logo-icon { width: 28px; height: 28px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .logo-icon svg { width: 14px; height: 14px; fill: #fff; }
+    
+    .nav-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px;
+      text-decoration: none; font-size: 14px; font-weight: 500; color: var(--muted); transition: 0.2s;
+    }
+    .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 600; }
+    .nav-item:hover { background: var(--blue-light); color: var(--blue); }
+    .icon { width: 18px; height: 18px; }
+
+    /* ===== MAIN LAYOUT ===== */
+    main {
+      flex: 1; margin-left: var(--sidebar-width);
+      display: flex; flex-direction: column; height: 100vh;
+    }
+
+    .builder-container {
+      display: flex; flex: 1; overflow: hidden; position: relative;
+    }
+
+    /* AI PANEL */
+    .ai-pane {
+      width: 320px; background: var(--bg); border-left: 1px solid var(--border);
+      overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px;
+    }
+    .ai-card { background: var(--blue-light); border-radius: 16px; padding: 20px; border: 1px solid rgba(37,99,235,0.1); }
+    .ai-score { font-size: 32px; font-weight: 900; color: var(--blue); margin-bottom: 4px; }
+    .ai-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    
+    .ai-list { list-style: none; margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .ai-list li { font-size: 13px; display: flex; gap: 8px; align-items: flex-start; }
+    .ai-list li::before { content: '✨'; font-size: 12px; }
+    .ai-list.weak li::before { content: '⚠️'; }
+
+    .btn-ai {
+        width: 100%; padding: 12px; background: var(--blue); color: #fff;
+        border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+    }
+    .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+
+    /* LEFT: FORM */
+    .form-pane {
+      width: 450px; background: var(--bg); border-right: 1px solid var(--border);
+      overflow-y: auto; padding: 40px; display: flex; flex-direction: column; gap: 32px;
+    }
+    .form-pane h2 { font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+    
+    .section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--blue); margin-bottom: 16px; border-bottom: 2px solid var(--blue-light); padding-bottom: 8px; }
+
+    .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+    .input-group label { font-size: 12px; font-weight: 700; color: var(--text-dark); }
+    .input-group input, .input-group textarea {
+      padding: 12px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 14px; font-family: inherit; outline: none; transition: 0.2s;
+      background: var(--bg); color: var(--text-dark);
+    }
+    .input-group input:focus, .input-group textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-light); }
+
+    .btn-add {
+        padding: 8px 16px; background: var(--blue-light); color: var(--blue);
+        border: none; border-radius: 8px; font-size: 12px; font-weight: 700;
+        cursor: pointer; align-self: flex-start; margin-top: -8px; margin-bottom: 16px;
+    }
+
+    /* RIGHT: PREVIEW */
+    .preview-pane {
+      flex: 1; background: var(--bg-gray); overflow: auto;
+      padding: 40px; display: flex; flex-direction: column; align-items: center;
+    }
+
+    .preview-controls {
+        margin-bottom: 20px; display: flex; gap: 10px; align-items: center;
+    }
+    .zoom-btn {
+        padding: 6px 14px; background: #fff; border: 1px solid var(--border); border-radius: 8px;
+        font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text-dark);
+    }
+
+    .zoom-wrapper {
+        transform-origin: top center;
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        padding-bottom: 60px;
+    }
+
+    .resume-a4 {
+      width: 794px; min-height: 1123px; background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      display: flex; flex-direction: column; color: #333; font-size: 14px; line-height: 1.5;
+    }
+
+    /* TEMPLATE SYSTEM BASE */
+    #resume-output[data-template="modern-dark"] { --header-bg: #333; --accent: #2563eb; }
+    #resume-output[data-template="indigo-edge"] { --header-bg: #4f46e5; --accent: #4f46e5; }
+    #resume-output[data-template="emerald-minimal"] { --header-bg: #065f46; --accent: #10b981; }
+    #resume-output[data-template="executive"] { --header-bg: #1e293b; --accent: #94a3b8; font-family: 'Georgia', serif; }
+    #resume-output[data-template="creative"] { --header-bg: #ea580c; --accent: #f97316; }
+    #resume-output[data-template="royal-blue"] { --header-bg: #1d4ed8; --accent: #3b82f6; }
+    #resume-output[data-template="sleek-slate"] { --header-bg: #334155; --accent: #06b6d4; }
+    #resume-output[data-template="developer"] { --header-bg: #0f172a; --accent: #6366f1; }
+    #resume-output[data-template="clean"] { --header-bg: #fff; --accent: #333; --text-light: #333; }
+    #resume-output[data-template="gold"] { --header-bg: #422006; --accent: #d97706; }
+
+    .r-header {
+      background: var(--header-bg); color: #fff; padding: 50px 40px;
+      display: flex; justify-content: space-between; align-items: center; gap: 30px;
+    }
+    #resume-output[data-template="clean"] .r-header { color: #333; border-bottom: 3px solid #333; padding-bottom: 20px; }
+    #resume-output[data-template="clean"] .c-icon { background: #333; color: #fff; }
+
+    /* LAYOUT VARIATIONS */
+    #resume-output[data-template="indigo-edge"] .r-content { display: flex; flex-direction: row; gap: 30px; }
+    #resume-output[data-template="indigo-edge"] .r-sec-title { width: 100%; border-bottom: 1px solid #ddd; margin-bottom: 12px; }
+    #resume-output[data-template="indigo-edge"] .sidebar-col { width: 220px; background: #f8fafc; padding: 20px; border-radius: 12px; }
+    #resume-output[data-template="indigo-edge"] .main-col { flex: 1; }
+
+    .name-flex { display: flex; align-items: center; gap: 24px; }
+    .r-photo { 
+        width: 100px; height: 100px; border-radius: 50%; border: 3px solid #fff; 
+        object-fit: cover; background: #555; display: none;
+    }
+    .r-photo.visible { display: block; }
+
+    .r-header .name-block h1 { font-family: 'Outfit', sans-serif; font-size: 36px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; }
+    .r-header .name-block p { font-size: 18px; opacity: 0.9; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; }
+
+    .contact-info { display: flex; flex-direction: column; gap: 12px; }
+    .c-item { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 500; }
+    .c-icon { width: 32px; height: 32px; background: #fff; border-radius: 50%; color: var(--resume-header-bg); display: flex; align-items: center; justify-content: center; }
+
+    .r-content { padding: 40px; display: flex; flex-direction: column; gap: 32px; }
+    .r-section { display: flex; gap: 40px; }
+    .r-sec-title { width: 140px; flex-shrink: 0; font-size: 18px; font-weight: 800; text-transform: capitalize; color: #111; border-bottom: 3px solid #111; padding-bottom: 4px; align-self: flex-start; }
+    .r-sec-body { flex: 1; font-size: 13px; color: #444; }
+
+    .exp-item, .edu-item { margin-bottom: 24px; }
+    .exp-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 800; color: #111; font-size: 14px; }
+    .exp-sub { font-weight: 600; color: #666; font-size: 13px; margin-bottom: 8px; }
+
+    .skill-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .skill-item { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .skill-dot { width: 6px; height: 6px; background: #111; border-radius: 50%; }
+
+    .lang-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .lang-name { width: 80px; font-weight: 700; font-size: 12px; }
+    .lang-bar { flex: 1; height: 6px; background: #eee; border-radius: 3px; position: relative; overflow: hidden; }
+    .lang-fill { height: 100%; background: #333; }
+
+    /* TEMPLATE SELECTOR UI */
+    .template-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 32px; }
+    .template-item {
+        border: 2px solid var(--border); border-radius: 12px; padding: 10px; cursor: pointer;
+        display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.2s;
+    }
+    .template-item.active { border-color: var(--blue); background: var(--blue-light); }
+    .template-thumb { width: 100%; height: 60px; border-radius: 6px; background: #ddd; }
+    .template-name { font-size: 11px; font-weight: 700; color: var(--text-dark); text-transform: capitalize; }
+
+    .btn-download {
+        position: fixed; bottom: 40px; right: 40px;
+        padding: 16px 32px; background: var(--blue); color: #fff;
+        border: none; border-radius: 14px; font-weight: 800; font-size: 15px;
+        box-shadow: 0 10px 30px rgba(37,99,235,0.3); display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s;
+    }
+    .btn-download:hover { transform: translateY(-4px); background: var(--blue-dark); }
+
+    @media print {
+      aside, .form-pane, .btn-download, .theme-icon-btn { display: none; }
+      main { margin-left: 0; }
+      .preview-pane { padding: 0; background: #fff; }
+      .resume-a4 { box-shadow: none; margin: 0; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+
+<aside>
+    <a href="dashboard.html" class="sidebar-header">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </div>
+      Bossed
+    </a>
+  
+    <nav class="nav-list">
+      <a href="dashboard.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </a>
+      <a href="dashboard.html#recent-simulations" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        Interviews
+      </a>
+      <a href="intelligence.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        Intelligence
+      </a>
+      <a href="resume-lab.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Resume Lab
+      </a>
+      <a href="resume-builder.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+        Resume Builder
+      </a>
+      <a href="pricing.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Pricing
+      </a>
+    </nav>
+</aside>
+
+<main>
+  <button class="theme-icon-btn" id="theme-toggle" title="Toggle Theme">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon" width="18" height="18"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+  </button>
+
+  <div class="builder-container">
+    <!-- INPUT AREA -->
+    <div class="form-pane">
+        <h2>Resume Builder</h2>
+        <p style="font-size:13px; margin-top:-4px; margin-bottom:24px;">Build a premium resume with real-time AI insights.</p>
+
+        <section>
+            <div class="section-title">Select Template</div>
+            <div class="template-grid" id="template-list">
+                <!-- Template list will be injected here -->
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">Personal Info</div>
+            <div class="input-group">
+                <label>Profile Photo</label>
+                <input type="file" id="in-photo" accept="image/*" onchange="handlePhoto(event)"/>
+            </div>
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="in-name" placeholder="MORGAN MAXWELL" oninput="updatePreview()"/>
+            </div>
+            <div class="input-group">
+                <label>Job Title</label>
+                <input type="text" id="in-role" placeholder="Marketing Manager" oninput="updatePreview()"/>
+            </div>
+            <div class="input-group">
+                <label>Phone</label>
+                <input type="text" id="in-phone" placeholder="+123-456-7890" oninput="updatePreview()"/>
+            </div>
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="in-email" placeholder="hello@reallygreatsite.com" oninput="updatePreview()"/>
+            </div>
+            <div class="input-group">
+                <label>Location</label>
+                <input type="text" id="in-location" placeholder="123 Anywhere St., Any City" oninput="updatePreview()"/>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">About Me</div>
+            <div class="input-group">
+                <textarea id="in-about" rows="4" placeholder="Brief professional summary..." oninput="updatePreview()"></textarea>
+            </div>
+        </section>
+
+        <section id="exp-fields">
+            <div class="section-title">Experience</div>
+            <div class="exp-entry">
+                <div class="input-group"><label>Company</label><input type="text" class="in-exp-comp" placeholder="Company Name" oninput="updatePreview()"/></div>
+                <div class="input-group"><label>Years</label><input type="text" class="in-exp-dates" placeholder="2017 - 2020" oninput="updatePreview()"/></div>
+                <div class="input-group"><label>Job Position</label><input type="text" class="in-exp-role" placeholder="Marketing Lead" oninput="updatePreview()"/></div>
+                <div class="input-group"><label>Description</label><textarea class="in-exp-desc" rows="3" placeholder="Key achievements..." oninput="updatePreview()"></textarea></div>
+            </div>
+        </section>
+        <button class="btn-add" onclick="addExp()">+ Add Experience</button>
+
+        <section id="edu-fields">
+            <div class="section-title">Education</div>
+            <div class="edu-entry">
+                <div class="input-group"><label>University</label><input type="text" class="in-edu-univ" placeholder="University Name" oninput="updatePreview()"/></div>
+                <div class="input-group"><label>Degree</label><input type="text" class="in-edu-degree" placeholder="Your Degree" oninput="updatePreview()"/></div>
+                <div class="input-group"><label>Year</label><input type="text" class="in-edu-year" placeholder="2015" oninput="updatePreview()"/></div>
+            </div>
+        </section>
+        <button class="btn-add" onclick="addEdu()">+ Add Education</button>
+
+        <section>
+            <div class="section-title">Expertise</div>
+            <div class="input-group">
+                <input type="text" id="in-skills" placeholder="UI/UX, Python, Logic (Comma separated)" oninput="updatePreview()"/>
+            </div>
+        </section>
+    </div>
+
+    <!-- PREVIEW AREA -->
+    <div class="preview-pane">
+        <div class="preview-controls">
+            <button class="zoom-btn" onclick="adjustZoom(-0.1)">-</button>
+            <span id="zoom-label" style="font-size:12px; font-weight:700;">Zoom: 75%</span>
+            <button class="zoom-btn" onclick="adjustZoom(0.1)">+</button>
+            <button class="zoom-btn" style="margin-left: 20px; background: var(--blue); color:#fff;" onclick="saveResume()">Save to Cloud</button>
+        </div>
+        <div class="zoom-wrapper" id="zoom-wrap" style="transform: scale(0.75);">
+            <div class="resume-a4" id="resume-output" data-template="modern-dark">
+                <!-- Inner structure remains the same -->
+                 <!-- HEADER (Template Switchable parts in sub-classes) -->
+                 <div class="r-header">
+                    <div class="name-block">
+                        <div class="name-flex">
+                            <img id="out-photo" class="r-photo" src="" alt="Profile"/>
+                            <div>
+                                <h1 id="out-name">MORGAN MAXWELL</h1>
+                                <p id="out-role">Marketing Manager</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-info">
+                   <div class="c-item"><div class="c-icon">📞</div><span id="out-phone">+123-456-7890</span></div>
+                   <div class="c-item"><div class="c-icon">✉</div><span id="out-email">hello@reallygreatsite.com</span></div>
+                   <div class="c-item"><div class="c-icon">📍</div><span id="out-location">123 Anywhere St., Any City</span></div>
+                </div>
+             </div>
+
+             <div class="r-content">
+                <!-- ABOUT -->
+                <div class="r-section">
+                    <div class="r-sec-title">About Me</div>
+                    <div class="r-sec-body" id="out-about">
+                        Lorem ipsum dolor sit amet, bonorum pertinax patrioque et pri, ea pri audire molestie ponderum, ei eripuit habemus delicatissimi eum. 
+                    </div>
+                </div>
+
+                <!-- EXPERIENCE -->
+                <div class="r-section">
+                    <div class="r-sec-title">Experience</div>
+                    <div class="r-sec-body" id="out-experience">
+                        <div class="exp-item">
+                            <div class="exp-header"><span>Company Name</span><span>2017 - 2020</span></div>
+                            <div class="exp-sub">Job Position</div>
+                            <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EDUCATION -->
+                <div class="r-section">
+                    <div class="r-sec-title">Education</div>
+                    <div class="r-sec-body" id="out-education">
+                        <div class="edu-item">
+                            <div class="exp-header"><span>University Name</span><span>2015</span></div>
+                            <div class="exp-sub">Your Degree</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER ROW -->
+                <div style="display:flex; gap: 40px;">
+                    <div style="flex:1;">
+                        <h3 style="font-size:16px; font-weight:800; margin-bottom:12px;">Expertise</h3>
+                        <div class="skill-grid" id="out-skills">
+                            <div class="skill-item"><div class="skill-dot"></div> ui/ux</div>
+                            <div class="skill-item"><div class="skill-dot"></div> leadership</div>
+                            <div class="skill-item"><div class="skill-dot"></div> coaching</div>
+                        </div>
+                    </div>
+                    <div style="width:200px;">
+                        <h3 style="font-size:16px; font-weight:800; margin-bottom:12px;">Language</h3>
+                        <div id="out-langs">
+                            <div class="lang-row"><span class="lang-name">English</span><div class="lang-bar"><div class="lang-fill" style="width:90%;"></div></div></div>
+                            <div class="lang-row"><span class="lang-name">Spanish</span><div class="lang-bar"><div class="lang-fill" style="width:70%;"></div></div></div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+    <!-- AI PANEL -->
+    <div class="ai-pane">
+        <div class="section-title">AI Assistant</div>
+        
+        <button class="btn-ai" onclick="generateAISummary()">
+            <span>🤖</span> Generate AI Summary
+        </button>
+
+        <button class="btn-ai" style="background:#0f172a;" onclick="analyzeWithAI()">
+            <span>🔍</span> Analyze Resume Quality
+        </button>
+
+        <div id="ai-results" style="display:none; margin-top:20px;">
+            <div class="ai-card">
+                <div class="ai-label">ATS Score</div>
+                <div class="ai-score" id="ai-score">85</div>
+                <p id="ai-insight" style="font-size:12px; color:var(--text);"></p>
+            </div>
+
+            <div style="margin-top:20px;">
+                <div class="ai-label">Strengths</div>
+                <ul class="ai-list" id="ai-strengths"></ul>
+            </div>
+
+            <div style="margin-top:20px;">
+                <div class="ai-label">Improvements</div>
+                <ul class="ai-list weak" id="ai-weakness"></ul>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <button class="btn-download" onclick="window.print()">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    Download PDF
+  </button>
+</main>
+
+<script>
+    let currentZoom = 0.75;
+    function adjustZoom(delta) {
+        currentZoom = Math.max(0.3, Math.min(1.5, currentZoom + delta));
+        document.getElementById('zoom-wrap').style.transform = `scale(${currentZoom})`;
+        document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(currentZoom * 100)}%`;
+    }
+
+    function handlePhoto(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = document.getElementById('out-photo');
+                img.src = event.target.result;
+                img.classList.add('visible');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    const templates = [
+        "modern-dark", "indigo-edge", "emerald-minimal", "executive", "creative",
+        "royal-blue", "sleek-slate", "developer", "clean", "gold"
+    ];
+
+    function initTemplates() {
+        const list = document.getElementById('template-list');
+        list.innerHTML = templates.map(t => `
+            <div class="template-item ${t === 'modern-dark' ? 'active' : ''}" onclick="switchTemplate('${t}', this)">
+                <div class="template-thumb" style="background: linear-gradient(135deg, ${getThumbColor(t)}, #f1f5f9);"></div>
+                <div class="template-name">${t.replace('-', ' ')}</div>
+            </div>
+        `).join('');
+    }
+
+    function switchTemplate(name, el) {
+        document.getElementById('resume-output').setAttribute('data-template', name);
+        document.querySelectorAll('.template-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function getThumbColor(t) {
+        const colors = {
+            'modern-dark': '#333', 'indigo-edge': '#4f46e5', 'emerald-minimal': '#065f46',
+            'executive': '#1e293b', 'creative': '#ea580c', 'royal-blue': '#1d4ed8',
+            'sleek-slate': '#334155', 'developer': '#0f172a', 'clean': '#eee', 'gold': '#422006'
+        };
+        return colors[t] || '#333';
+    }
+
+    async function saveResume() {
+        const data = {
+            name: document.getElementById('in-name').value,
+            role: document.getElementById('in-role').value,
+            phone: document.getElementById('in-phone').value,
+            email: document.getElementById('in-email').value,
+            location: document.getElementById('in-location').value,
+            about: document.getElementById('in-about').value,
+            experience: [], // Loop and collect
+            education: [],
+            skills: document.getElementById('in-skills').value.split(','),
+        };
+        
+        try {
+            const res = await fetch('http://localhost:8000/api/resume/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                body: JSON.stringify({ template: document.getElementById('resume-output').dataset.template, data })
+            });
+            if(res.ok) alert("✅ Resume saved successfully!");
+        } catch(e) { console.error(e); }
+    }
+
+    async function generateAISummary() {
+        const btn = event.currentTarget;
+        btn.innerHTML = 'Generating...';
+        try {
+            const res = await fetch('http://localhost:8000/api/resume/generate-summary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: document.getElementById('in-role').value, skills: document.getElementById('in-skills').value })
+            });
+            const data = await res.json();
+            document.getElementById('in-about').value = data.summary;
+            updatePreview();
+        } finally { btn.innerHTML = '<span>🤖</span> Generate AI Summary'; }
+    }
+
+    async function analyzeWithAI() {
+        const pan = document.getElementById('ai-results');
+        pan.style.display = 'block';
+        pan.style.opacity = '0.5';
+        try {
+            const res = await fetch('http://localhost:8000/api/resume/analyze', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const data = await res.json();
+            document.getElementById('ai-score').textContent = data.score;
+            document.getElementById('ai-insight').textContent = data.summary_insight;
+            document.getElementById('ai-strengths').innerHTML = data.strengths.map(s => `<li>${s}</li>`).join('');
+            document.getElementById('ai-weakness').innerHTML = data.weaknesses.map(s => `<li>${s}</li>`).join('');
+        } finally { pan.style.opacity = '1'; }
+    }
+
+    function addEdu() {
+        const container = document.getElementById('edu-fields');
+        const div = document.createElement('div');
+        div.className = 'edu-entry';
+        div.style.marginTop = '20px';
+        div.innerHTML = `
+            <div class="input-group"><label>University</label><input type="text" class="in-edu-univ" placeholder="University Name" oninput="updatePreview()"/></div>
+            <div class="input-group"><label>Degree</label><input type="text" class="in-edu-degree" placeholder="Your Degree" oninput="updatePreview()"/></div>
+            <div class="input-group"><label>Year</label><input type="text" class="in-edu-year" placeholder="2018" oninput="updatePreview()"/></div>
+        `;
+        container.appendChild(div);
+    }
+
+    function updatePreview() {
+        // Simple data binding
+        document.getElementById('out-name').textContent = document.getElementById('in-name').value || 'MORGAN MAXWELL';
+        document.getElementById('out-role').textContent = document.getElementById('in-role').value || 'Marketing Manager';
+        document.getElementById('out-phone').textContent = document.getElementById('in-phone').value || '+123-456-7890';
+        document.getElementById('out-email').textContent = document.getElementById('in-email').value || 'hello@reallygreatsite.com';
+        document.getElementById('out-location').textContent = document.getElementById('in-location').value || '123 Anywhere St., Any City';
+        document.getElementById('out-about').textContent = document.getElementById('in-about').value || 'Brief professional summary...';
+
+        // Experience
+        const expItems = document.querySelectorAll('.exp-entry');
+        let expHtml = '';
+        expItems.forEach(item => {
+            const comp = item.querySelector('.in-exp-comp').value || 'Company Name';
+            const dates = item.querySelector('.in-exp-dates').value || '2017 - 2020';
+            const role = item.querySelector('.in-exp-role').value || 'Job Position';
+            const desc = item.querySelector('.in-exp-desc').value || 'Key achievements and responsibilities...';
+            expHtml += `
+                <div class="exp-item">
+                    <div class="exp-header"><span>${comp}</span><span>${dates}</span></div>
+                    <div class="exp-sub">${role}</div>
+                    <div>${desc}</div>
+                </div>
+            `;
+        });
+        document.getElementById('out-experience').innerHTML = expHtml;
+
+        // Education
+        const eduItems = document.querySelectorAll('.edu-entry');
+        let eduHtml = '';
+        eduItems.forEach(item => {
+            const univ = item.querySelector('.in-edu-univ').value || 'University Name';
+            const degree = item.querySelector('.in-edu-degree').value || 'Your Degree';
+            const year = item.querySelector('.in-edu-year').value || '2015';
+            eduHtml += `
+                <div class="edu-item">
+                    <div class="exp-header"><span>${univ}</span><span>${year}</span></div>
+                    <div class="exp-sub">${degree}</div>
+                </div>
+            `;
+        });
+        document.getElementById('out-education').innerHTML = eduHtml;
+
+        // Skills
+        const skillsVal = document.getElementById('in-skills').value;
+        const skillsArr = skillsVal.split(',').map(s => s.trim()).filter(s => s !== '');
+        if (skillsArr.length > 0) {
+            document.getElementById('out-skills').innerHTML = skillsArr.map(s => `<div class="skill-item"><div class="skill-dot"></div> ${s}</div>`).join('');
+        }
+    }
+
+    // Theme Logic
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+        const body = document.body;
+        const current = body.getAttribute('data-theme');
+        const next = current === 'light' ? 'dark' : 'light';
+        body.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateThemeIcon(next);
+    });
+
+    function updateThemeIcon(theme) {
+        const icon = document.getElementById('theme-icon');
+        if (theme === 'dark') {
+            icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>';
+        } else {
+            icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+        }
+    }
+
+    window.addEventListener('load', () => {
+        initTemplates();
+        const saved = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', saved);
+        updateThemeIcon(saved);
+        updatePreview();
+    });
+</script>
+
+</body>
+</html>

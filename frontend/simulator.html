@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interview Simulator — Bossed AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --bg: #ffffff;
+      --bg-gray: #f8fafc;
+      --bg-card: #ffffff;
+      --text: #374151;
+      --text-dark: #111827;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --bg-gray: #020617;
+      --bg-card: #1e293b;
+      --text: #94a3b8;
+      --text-dark: #f8fafc;
+      --muted: #64748b;
+      --border: #334155;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gray);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ===== NAVIGATION ===== */
+    nav {
+      height: 64px; border-bottom: 1px solid var(--border);
+      padding: 0 40px; display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg);
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      transition: background 0.3s, border 0.3s;
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 18px; color: var(--text-dark);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 28px; height: 28px; background: var(--blue);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 14px; height: 14px; fill: #fff; }
+
+    .session-info {
+        display: flex; align-items: center; gap: 12px;
+        background: var(--zinc-light); padding: 6px 14px; border-radius: 99px; font-size: 13px; font-weight: 600;
+    }
+    .live-dot { width: 8px; height: 8px; background: var(--error); border-radius: 50%; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+    /* ===== MAIN LAYOUT ===== */
+    main {
+      flex: 1; margin-top: 64px;
+      display: grid; grid-template-columns: 1fr 360px;
+      height: calc(100vh - 64px);
+    }
+
+    /* ===== VIDEO / SIMULATOR VIEW ===== */
+    .simulator-panel {
+      padding: 40px; position: relative;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+
+    .video-container {
+      width: 100%; max-width: 800px; aspect-ratio: 16/9;
+      background: #000; border-radius: 32px;
+      border: 4px solid #fff; overflow: hidden;
+      position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .video-placeholder {
+      width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 16px; background: #0f172a;
+    }
+    .video-placeholder p { color: #94a3b8; font-size: 14px; font-weight: 500; }
+
+    /* AI Avatar / Voice Circle */
+    .ai-voice-orb {
+      width: 110px; height: 110px; border-radius: 50%;
+      background: var(--blue); position: relative;
+      background: radial-gradient(circle at center, var(--blue) 0%, #1e40af 100%);
+      box-shadow: 0 0 30px rgba(37, 99, 235, 0.3);
+      animation: float 3s ease-in-out infinite;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .voice-wave {
+      position: absolute; border: 2px solid var(--blue);
+      border-radius: 50%; opacity: 0; animation: wave 2s linear infinite;
+    }
+    .wave-2 { animation-delay: 0.5s; }
+    .wave-3 { animation-delay: 1s; }
+
+    @keyframes wave {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(3); opacity: 0; }
+    }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    /* Controls */
+    .simulator-controls {
+      margin-top: 40px; display: flex; align-items: center; gap: 20px;
+    }
+    .btn-circle {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #fff; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: 0.2s; color: var(--dark);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .btn-circle:hover { background: var(--bg-gray); transform: translateY(-2px); }
+    .btn-end {
+      padding: 0 32px; height: 56px; border-radius: 28px;
+      background: #ef4444; border: none; color: #fff;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 10px; transition: 0.2s;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+    .btn-end:hover { background: #dc2626; transform: translateY(-2px); }
+
+    /* ===== SIDEBAR TRANSCRIPT ===== */
+    .transcript-panel {
+      border-left: 1px solid var(--border); background: var(--bg);
+      display: flex; flex-direction: column;
+      transition: background 0.3s;
+    }
+    .transcript-header {
+      padding: 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .transcript-header h3 { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+
+    .transcript-body { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+    
+    .message { display: flex; flex-direction: column; gap: 4px; max-width: 90%; }
+    .message.ai { align-self: flex-start; }
+    .message.user { align-self: flex-end; align-items: flex-end; }
+
+    .msg-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .msg-content {
+      padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.5;
+    }
+    .ai .msg-content { background: var(--bg-gray); border: 1px solid var(--border); color: var(--text); }
+    .user .msg-content { background: var(--blue); color: #fff; }
+
+    .typing-indicator { font-size: 12px; color: var(--muted); margin-top: 8px; display: none; }
+
+    /* ===== PROMPT OVERLAY ===== */
+    .setup-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(8px); z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .setup-card {
+      width: 100%; max-width: 480px;
+      background: var(--bg); border-radius: 32px;
+      padding: 40px; border: 1px solid var(--border);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+      transition: background 0.3s;
+    }
+    .setup-card h2 { font-size: 24px; font-weight: 800; margin-bottom: 8px; color: var(--text-dark); }
+    .setup-card p { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+
+    .setup-form .form-group { margin-bottom: 24px; }
+    .setup-form label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+    .setup-form input, .setup-form select {
+      width: 100%; padding: 14px; border: 1px solid var(--border);
+      background: var(--bg-gray); border-radius: 12px;
+      color: var(--text-dark); font-size: 15px; outline: none; transition: 0.2s;
+    }
+    .setup-form input:focus { border-color: var(--blue); background: var(--bg); }
+
+    .btn-start-session {
+      width: 100%; padding: 14px; background: var(--blue);
+      border: none; border-radius: 14px; color: #fff;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s;
+    }
+    .btn-start-session:hover { background: var(--blue-dark); transform: translateY(-2px); }
+
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="dashboard.html" class="nav-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+    </div>
+    Bossed AI
+  </a>
+
+  <div class="session-info">
+    <div class="live-dot"></div>
+    Session: <span id="session-time">00:00</span>
+  </div>
+
+  <div style="display:flex; align-items:center; gap:16px;">
+    <button id="theme-toggle" style="background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;" title="Toggle Theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" id="theme-icon"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+  </div>
+</nav>
+
+<main id="main-content" style="opacity:0.5; pointer-events:none;">
+  <div class="simulator-panel">
+    <div class="video-container">
+      <div class="video-placeholder">
+        <div class="ai-voice-orb" id="voice-orb">
+          <div class="voice-wave"></div>
+          <div class="voice-wave wave-2"></div>
+          <div class="voice-wave wave-3"></div>
+          <svg width="40" height="40" fill="#fff" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        </div>
+        <p>AI Interviewer (Ready)</p>
+      </div>
+    </div>
+
+    <div class="simulator-controls">
+      <button class="btn-circle" title="Mute Microphone">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+      <button class="btn-circle" title="Settings">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+      <button class="btn-end" onclick="finishInterview()">End Interview</button>
+    </div>
+  </div>
+
+  <div class="transcript-panel">
+    <div class="transcript-header">
+      <h3>Live Transcript</h3>
+      <span style="font-size:11px; font-weight:700; color:var(--success);">RECORDING ON</span>
+    </div>
+    <div class="transcript-body" id="transcript-container">
+      <div class="message ai">
+        <span class="msg-label">Interviewer</span>
+        <div class="msg-content">Hello there! I'm your AI Interviewer. Please start when you're ready. What role are we preparing for today?</div>
+      </div>
+    </div>
+    <div style="padding: 16px 24px; border-top: 1px solid var(--border);">
+        <div style="display:flex; gap:8px;">
+            <input type="text" id="user-input" placeholder="Type your answer..." style="flex:1; padding:10px 14px; border:1px solid var(--border); border-radius:10px; font-size:14px; outline:none;" onkeypress="if(event.key==='Enter') sendMessage()" />
+            <button onclick="sendMessage()" style="padding:10px 20px; background:var(--blue); color:white; border:none; border-radius:10px; font-weight:700; cursor:pointer;">Send</button>
+        </div>
+        <p class="typing-indicator" id="typing" style="margin-top:8px;">AI is thinking...</p>
+    </div>
+  </div>
+</main>
+
+<!-- Setup Overlay -->
+<div class="setup-overlay" id="setup-overlay">
+  <div class="setup-card">
+    <h2>Configure Simulator</h2>
+    <p>Tell us about the interview you want to simulate.</p>
+    
+    <div class="setup-form">
+      <div class="form-group">
+        <label>Job Title / Role</label>
+        <select id="role-input">
+          <option value="Software Engineer">Software Engineer</option>
+          <option value="Frontend Developer">Frontend Developer</option>
+          <option value="Backend Developer">Backend Developer</option>
+          <option value="Full Stack Developer">Full Stack Developer</option>
+          <option value="Data Scientist">Data Scientist</option>
+          <option value="Product Manager">Product Manager</option>
+          <option value="UX Designer">UX Designer</option>
+          <option value="DevOps Engineer">DevOps Engineer</option>
+          <option value="Mobile Developer">Mobile Developer</option>
+          <option value="Engineering Manager">Engineering Manager</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Company</label>
+        <select id="company-input">
+          <option value="Google">Google</option>
+          <option value="Meta">Meta</option>
+          <option value="Amazon">Amazon</option>
+          <option value="Netflix">Netflix</option>
+          <option value="Microsoft">Microsoft</option>
+          <option value="Apple">Apple</option>
+          <option value="Stripe">Stripe</option>
+          <option value="Airbnb">Airbnb</option>
+          <option value="Uber">Uber</option>
+          <option value="Custom / General">Custom / General</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Interview Type</label>
+        <select id="type-select">
+          <option>Full Simulation (Mixed)</option>
+          <option>Behavioural Only</option>
+          <option>Technical / Domain Specific</option>
+          <option>Culture Fit</option>
+        </select>
+      </div>
+      <button class="btn-start-session" onclick="startActualSession()">Start Session &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    // Apply Theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+  });
+
+  const themeToggle = document.getElementById('theme-toggle');
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+  });
+
+  function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (theme === 'dark') {
+      icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>';
+    } else {
+      icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    }
+  }
+
+  let sessionActive = false;
+  let seconds = 0;
+  let interviewHistory = [];
+  let currentRole = '';
+  let currentCompany = '';
+
+  async function startActualSession() {
+    currentRole = document.getElementById('role-input').value;
+    currentCompany = document.getElementById('company-input').value;
+
+    document.getElementById('setup-overlay').style.display = 'none';
+    const main = document.getElementById('main-content');
+    main.style.opacity = '1';
+    main.style.pointerEvents = 'all';
+    
+    sessionActive = true;
+    startTimer();
+    
+    // Fetch initial AI question
+    getAIResponse(`Welcome! Let's begin. Imagine I'm the principal interviewer from ${currentCompany}. Give me an opening question for a ${currentRole} candidate.`);
+  }
+
+  async function getAIResponse(contextText) {
+    const typing = document.getElementById('typing');
+    typing.style.display = 'block';
+
+    try {
+      const res = await fetch('http://localhost:8000/api/interview/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          role: currentRole,
+          company: currentCompany,
+          context: contextText,
+          history: interviewHistory
+        })
+      });
+      const data = await res.json();
+      addMessage('ai', data.answer);
+      interviewHistory.push({ role: 'ai', content: data.answer });
+    } catch (err) {
+      addMessage('ai', "Sorry, I'm having trouble connecting to the brain. Please check if the backend is running!");
+    } finally {
+      typing.style.display = 'none';
+    }
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if (!text || !sessionActive) return;
+
+    input.value = '';
+    addMessage('user', text);
+    interviewHistory.push({ role: 'user', content: text });
+
+    getAIResponse(text);
+  }
+
+  function addMessage(who, text) {
+    const container = document.getElementById('transcript-container');
+    const msg = document.createElement('div');
+    msg.className = `message ${who}`;
+    msg.innerHTML = `
+      <span class="msg-label">${who === 'ai' ? 'Interviewer' : 'You'}</span>
+      <div class="msg-content">${text}</div>
+    `;
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function startTimer() {
+    const timerEl = document.getElementById('session-time');
+    setInterval(() => {
+      if (sessionActive) {
+        seconds++;
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        timerEl.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      }
+    }, 1000);
+  }
+
+  function finishInterview() {
+    sessionActive = false;
+    alert('Interview complete! Redirecting to your Performance Report...');
+    window.location.href = 'dashboard.html';
+  }
+
+  // Voice Pulse Simulation
+  setInterval(() => {
+    if (sessionActive) {
+        const orb = document.getElementById('voice-orb');
+        orb.style.transform = `scale(${1 + Math.random() * 0.1})`;
+    }
+  }, 100);
+
+</script>
+
+</body>
+</html>
