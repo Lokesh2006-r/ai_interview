@@ -3,41 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard — Bossed AI</title>
+  <title>Dashboard — Hirvo AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --blue: #2563eb;
-      --blue-dark: #1d4ed8;
+      --blue-dark: #0f172a;
       --blue-light: #eff6ff;
       --bg: #ffffff;
       --bg-gray: #f8fafc;
       --bg-card: #ffffff;
-      --text: #374151;
-      --text-dark: #111827;
-      --muted: #6b7280;
-      --border: #e2e8f0;
+      --text: #4b5563;
+      --text-dark: #0f172a;
+      --muted: #94a3b8;
+      --border: #f1f5f9;
       --success: #10b981;
       --warning: #f59e0b;
       --error: #ef4444;
-      --sidebar-width: 260px;
-      --sidebar-bg: #ffffff;
+      --radius-lg: 28px;
+      --radius-md: 16px;
     }
-
     [data-theme="dark"] {
       --bg: #09090b;
       --bg-gray: #020617;
       --bg-card: #111827;
-      --sidebar-bg: #0f172a;
       --text: #94a3b8;
       --text-dark: #f8fafc;
       --muted: #64748b;
       --border: #1e293b;
-      --blue-light: rgba(37, 99, 235, 0.1);
+      --blue-light: rgba(37, 99, 235, 0.15);
     }
 
     body {
@@ -45,65 +42,86 @@
       background: var(--bg-gray);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
+      display: flex; flex-direction: column;
       -webkit-font-smoothing: antialiased;
       transition: background 0.3s, color 0.3s;
     }
 
-    /* ===== SIDEBAR ===== */
-    aside {
-      width: var(--sidebar-width);
-      background: var(--sidebar-bg);
-      border-right: 1px solid var(--border);
-      height: 100vh;
-      display: flex; flex-direction: column;
-      position: fixed; left: 0; top: 0;
-      z-index: 100;
+    /* ===== TOP NAVIGATION ===== */
+    .top-nav {
+      height: 72px;
+      padding: 0 5%;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      transition: background 0.3s, border 0.3s;
     }
+    [data-theme="dark"] .top-nav { background: rgba(9, 9, 11, 0.8); }
 
-    .sidebar-header {
-      padding: 24px 20px;
+    .theme-icon-btn {
+      width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--bg-card); color: var(--text-dark);
+      cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    }
+    .theme-icon-btn:hover { border-color: var(--blue); transform: scale(1.05); }
+    .theme-icon-btn svg { width: 18px; height: 18px; }
+
+    .nav-left { display: flex; align-items: center; gap: 40px; }
+    
+    .nav-brand {
       display: flex; align-items: center; gap: 10px;
-      font-weight: 800; font-size: 18px; color: var(--text-dark);
+      font-weight: 900; font-size: 20px; color: var(--text-dark);
       text-decoration: none;
+      letter-spacing: -1px;
     }
 
-    .logo-icon {
-      width: 28px; height: 28px; background: var(--blue);
-      border-radius: 8px; display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    
+    .nav-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: var(--radius-md);
+      text-decoration: none; font-size: 14px; font-weight: 600;
+      color: var(--text); transition: all 0.2s;
     }
-    .logo-icon svg { width: 14px; height: 14px; fill: #fff; }
+    .nav-link:hover { background: var(--bg-gray); color: var(--text-dark); }
+    .nav-link.active { background: var(--blue-light); color: var(--blue); }
 
-    .nav-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
-    
-    .nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 12px; border-radius: 10px;
-      text-decoration: none; font-size: 14px; font-weight: 500;
-      color: var(--muted); transition: all 0.2s;
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+
+    .btn-upgrade {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 20px; background: var(--text-dark); border: none;
+      border-radius: var(--radius-md); color: #fff; font-size: 13px; font-weight: 700;
+      text-decoration: none; transition: 0.2s;
     }
+    .btn-upgrade:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
-    .nav-item:hover { background: var(--blue-light); color: var(--blue); }
-    .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 600; }
-    
-    .nav-item svg { width: 18px; height: 18px; opacity: 0.7; }
-    .nav-item.active svg { opacity: 1; }
-
-    .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); }
-    
     .user-pill {
       display: flex; align-items: center; gap: 10px;
-      padding: 8px; border-radius: 12px; background: var(--bg-gray);
-      text-decoration: none; color: var(--dark); font-size: 13px; font-weight: 600;
+      padding: 6px 12px; border-radius: 99px;
+      background: var(--bg-gray); border: 1px solid var(--border);
+      text-decoration: none; color: var(--text-dark);
+      transition: all 0.2s;
     }
-    .user-pill img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+    .user-pill:hover { background: var(--blue-light); border-color: var(--blue); }
+    
+    .user-pill img {
+      width: 32px; height: 32px; border-radius: 50%;
+      object-fit: cover; border: 1.5px solid #fff; flex-shrink: 0;
+    }
+    .user-pill span {
+      font-size: 13px; font-weight: 600;
+    }
 
     /* ===== MAIN CONTENT ===== */
     main {
       flex: 1;
-      margin-left: var(--sidebar-width);
-      padding: 32px 40px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px 5%;
       display: flex; flex-direction: column; gap: 32px;
     }
 
@@ -170,128 +188,175 @@
     .stats-value { font-size: 32px; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
     .stats-diff { font-size: 12px; font-weight: 600; color: var(--success); display: flex; align-items: center; gap: 4px; }
 
-    /* ===== INTERVIEW LIST ===== */
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .section-header h3 { font-size: 18px; font-weight: 700; color: var(--text-dark); }
+    /* ===== MODAL STYLES ===== */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center;
+      z-index: 1000; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+      background: var(--bg-card); border-radius: 24px; max-width: 600px; width: 100%;
+      border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+      position: relative; max-height: 90vh; overflow-y: auto;
+      animation: modalSlide 0.3s ease-out;
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header { padding: 32px 32px 16px; border-bottom: 1px solid var(--border); }
+    .modal-header h2 { font-size: 20px; font-weight: 800; color: var(--text-dark); }
+    .modal-header p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+    .modal-body { padding: 32px; display: flex; flex-direction: column; gap: 24px; }
+    
+    .modal-section-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    .score-banner {
+      background: var(--blue-light); border-radius: 16px; padding: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .score-banner-text div:first-child { font-size: 13px; font-weight: 600; color: var(--blue); }
+    .score-banner-text div:last-child { font-size: 32px; font-weight: 800; color: var(--blue); }
+
+    .transcript-item {
+      padding: 12px; border-radius: 12px; font-size: 14px; line-height: 1.5;
+    }
+    .transcript-ai { background: var(--bg-gray); color: var(--text-dark); border-left: 3px solid var(--blue); }
+    .transcript-user { background: var(--blue-light); color: var(--blue); margin-left: 20px; border-right: 3px solid var(--blue); }
+
+    .close-modal {
+      position: absolute; right: 20px; top: 20px; background: none; border: none;
+      color: var(--muted); cursor: pointer; padding: 8px; border-radius: 50%;
+      transition: 0.2s;
+    }
+    .close-modal:hover { background: var(--bg-gray); color: var(--text-dark); }
+
+    /* ===== INTERVIEW LIST STYLES ===== */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .section-header h3 { font-size: 18px; font-weight: 800; color: var(--text-dark); }
     .section-link { font-size: 13px; font-weight: 600; color: var(--blue); text-decoration: none; }
 
     .interview-list { display: flex; flex-direction: column; gap: 12px; }
     
     .interview-row {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
-      transition: all 0.2s; cursor: pointer;
+      background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 18px;
+      padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; transition: all 0.2s;
     }
-    .interview-row:hover { border-color: var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .interview-row:hover { border-color: var(--blue); transform: translateX(8px); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
 
     .role-info { display: flex; align-items: center; gap: 16px; }
-    .comp-logo { width: 44px; height: 44px; border-radius: 12px; background: var(--bg-gray); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: var(--muted); border: 1px solid var(--border); }
     
-    .role-details h4 { font-size: 15px; font-weight: 700; color: var(--text-dark); }
-    .role-details p { font-size: 13px; color: var(--muted); margin-top: 2px; }
-
-    .theme-icon-btn {
-      width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--bg-card); color: var(--text-dark);
-      cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
-    }
-    .theme-icon-btn:hover { background: var(--bg-gray); border-color: var(--blue); transform: translateY(-2px); }
-    .theme-icon-btn svg { width: 18px; height: 18px; }
-
-    .score-badge {
-      display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
-    }
-    .score-val { font-size: 16px; font-weight: 700; color: var(--blue); }
-    .score-date { font-size: 11px; font-weight: 500; color: var(--muted); }
-
-    /* Sidebar icons size */
-    .icon { width: 18px; height: 18px; }
-
-    /* Responsive */
-    @media (max-width: 1024px) {
-      .dashboard-grid { grid-template-columns: 1fr; }
-      .hero-card { grid-column: span 1; }
+    .comp-logo {
+      width: 44px; height: 44px; border-radius: 12px; background: var(--blue-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 800; color: var(--blue); text-transform: uppercase;
     }
 
-    @media (max-width: 768px) {
-      aside { transform: translateX(-100%); transition: transform 0.3s; }
-      aside.open { transform: translateX(0); }
-      main { margin-left: 0; padding: 24px 16px; }
+    .role-details h4 { font-size: 15px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+    .role-details p { font-size: 13px; color: var(--muted); font-weight: 500; }
+
+    .score-badge { text-align: right; }
+    .score-val { font-size: 16px; font-weight: 800; color: var(--text-dark); }
+    .score-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ===== SELECTION SLIDES ===== */
+    .setup-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px); z-index: 2000; align-items: center; justify-content: center;
+      padding: 20px;
     }
+    .setup-modal.active { display: flex; }
+    
+    .setup-content {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 28px;
+      width: 100%; max-width: 650px; padding: 48px; position: relative;
+      overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+    }
+    
+    .setup-slide { display: none; animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .setup-slide.active { display: block; }
+    
+    @keyframes slideIn {
+      from { transform: translateX(30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .setup-header { margin-bottom: 32px; }
+    .setup-header h2 { font-size: 26px; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+    .setup-header p { font-size: 14px; color: var(--muted); margin-top: 6px; }
+
+    .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .select-card {
+      padding: 20px; border: 1.5px solid var(--border); border-radius: 16px;
+      cursor: pointer; transition: all 0.2s; background: var(--bg-card);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .select-card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+    .select-card.active { border-color: var(--blue); background: var(--blue-light); }
+    .select-card h4 { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+    .select-card p { font-size: 12px; color: var(--muted); }
+
+    .setup-footer { margin-top: 40px; display: flex; justify-content: space-between; align-items: center; }
+    .step-dots { display: flex; gap: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: 0.3s; }
+    .dot.active { width: 24px; border-radius: 4px; background: var(--blue); }
+
+    .btn-next {
+      padding: 12px 28px; background: var(--text-dark); color: white; border-radius: 12px;
+      font-weight: 700; border: none; cursor: pointer; transition: 0.2s;
+    }
+    .btn-next:hover { transform: scale(1.02); }
+    .btn-back { background: none; border: none; color: var(--muted); font-weight: 600; cursor: pointer; }
   </style>
 </head>
 <body>
 
-<aside>
-  <div class="sidebar-header">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="index.html" class="nav-brand">
+      Hirvo AI
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </a>
+      <a href="dashboard.html#recent-simulations" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        Interviews
+      </a>
+      <a href="resume-lab.html" class="nav-link">
+        Resume Lab
+      </a>
     </div>
-    Bossed
   </div>
 
-  <nav class="nav-list">
-    <a href="dashboard.html" class="nav-item active">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Home
+  <div class="nav-right">
+    <button class="theme-icon-btn" id="theme-toggle" title="Toggle Theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <div style="background:var(--border); width:1px; height:24px;"></div>
+    <a href="login.html" class="nav-link" style="color:var(--error);" onclick="localStorage.clear()">
+       Log Out
     </a>
-    <a href="dashboard.html#recent-simulations" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
-      Interviews
-    </a>
-    <a href="intelligence.html" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-      Intelligence
-    </a>
-    <a href="resume-lab.html" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      Resume Lab
-    </a>
-    <a href="resume-builder.html" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-      Resume Builder
-    </a>
-    <a href="pricing.html" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      Pricing
-    </a>
-    <div style="flex:1;"></div>
-    <a href="#" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      Settings
-    </a>
-    <a href="login.html" class="nav-item" style="color:var(--error);" onclick="localStorage.clear()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Log Out
-    </a>
-  </nav>
-
-  <div class="sidebar-footer">
     <a href="#" class="user-pill">
       <img src="https://ui-avatars.com/api/?name=User&background=eff6ff&color=2563eb&bold=true" id="user-avatar" alt="User" />
-      <div style="overflow:hidden; text-overflow:ellipsis;">
-        <span id="user-name" style="color:var(--text-dark);">User Name</span><br/>
-        <span style="font-size:11px; color:var(--muted); font-weight:400;">Free Plan</span>
-      </div>
+      <span id="user-name" style="color:var(--text-dark);">User Name</span>
     </a>
   </div>
-</aside>
+</nav>
 
 <main>
   <header class="top-bar">
     <div class="greeting">
-      <h1>Hello, <span id="user-firstname">Lokesh</span>! 👋</h1>
+      <h1>Hello, <span id="user-firstname">User</span>!</h1>
       <p>Master your interview presence today.</p>
-    </div>
-    <div class="header-actions">
-      <button class="theme-icon-btn" id="theme-toggle" title="Toggle Theme">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-      </button>
-      <div style="background:var(--border); width:1px; height:24px;"></div>
-      <a href="#" class="btn-upgrade">✨ Upgrade to Pro</a>
-      <button style="background:none; border:none; color:var(--muted); cursor:pointer;">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-      </button>
     </div>
   </header>
 
@@ -313,14 +378,14 @@
         <div class="status-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17 5.8 21.3l2.4-7.4L2 9.4h7.6L12 2z"/></svg></div>
       </div>
       <div>
-        <div class="stats-value">78%</div>
+        <div class="stats-value" id="avg-score-val">--%</div>
         <div class="stats-diff">
           <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-          +4% from last week
+          <span id="avg-score-diff">0% from last session</span>
         </div>
       </div>
       <div style="margin-top:20px; height:4px; background:var(--bg-gray); border-radius:2px; overflow:hidden;">
-        <div style="width:78%; height:100%; background:var(--blue); border-radius:2px;"></div>
+        <div id="avg-score-progress" style="width:0%; height:100%; background:var(--blue); border-radius:2px;"></div>
       </div>
     </div>
   </div>
@@ -332,63 +397,115 @@
     </div>
     
     <div class="interview-list" id="interview-list">
-      <!-- Item 1 -->
-      <div class="interview-row">
-        <div class="role-info">
-          <div class="comp-logo" style="background:#000; color:#fff;">G</div>
-          <div class="role-details">
-            <h4>Google — Software Engineer</h4>
-            <p>Behavioural & Technical • 15 mins</p>
-          </div>
-        </div>
-        <div class="score-badge">
-          <div class="score-val">82/100</div>
-          <div class="score-date">Yesterday, 14:20</div>
-        </div>
-      </div>
+      <div style="padding:40px; text-align:center; color:var(--muted); font-size:14px;">Loading simulations...</div>
+    </div>
+  </section>
 
-      <!-- Item 2 -->
-      <div class="interview-row">
-        <div class="role-info">
-          <div class="comp-logo" style="background:#fff; color:#0e76a8;">in</div>
-          <div class="role-details">
-            <h4>LinkedIn — Product Manager</h4>
-            <p>Product Strategy • 12 mins</p>
-          </div>
-        </div>
-        <div class="score-badge">
-          <div class="score-val">74/100</div>
-          <div class="score-date">2 days ago, 11:05</div>
-        </div>
+  <!-- Interview Detail Modal -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeDetailModal()">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="modal-header">
+        <h2 id="modal-title">Company Name — Role</h2>
+        <p id="modal-date">Date of interview</p>
       </div>
-
-      <!-- Item 3 -->
-      <div class="interview-row">
-        <div class="role-info">
-          <div class="comp-logo" style="background:#5865F2; color:#fff;">D</div>
-          <div class="role-details">
-            <h4>Discord — Frontend Developer</h4>
-            <p>React & CSS • 20 mins</p>
+      <div class="modal-body">
+        <div class="score-banner">
+          <div class="score-banner-text">
+            <div>Performance Score</div>
+            <div id="modal-score">0/100</div>
           </div>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--blue)"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17 5.8 21.3l2.4-7.4L2 9.4h7.6L12 2z"/></svg>
         </div>
-        <div class="score-badge">
-            <div style="font-size:12px; font-weight:600; color:var(--muted);">In Progress</div>
-            <div class="score-date">Mar 25, 09:45</div>
+        
+        <div>
+          <div class="modal-section-title">Personalized Feedback</div>
+          <p id="modal-feedback" style="font-size:14px; color:var(--text); line-height:1.6; margin-top:8px;">
+            Analyzing your performance...
+          </p>
+        </div>
+
+        <div>
+           <div class="modal-section-title">Simulation Highlights</div>
+           <div id="modal-transcript" style="display:flex; flex-direction:column; gap:12px; margin-top:12px;">
+             <!-- Transcripts will load here -->
+           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
   <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
     <div class="stats-card">
         <div class="stats-card-header"><span>Clarity Score</span></div>
-        <div class="stats-value" style="color:var(--success);">High</div>
-        <p style="font-size:12px; color:var(--muted);">Your articulation is clear and professional.</p>
+        <div class="stats-value" id="avg-clarity-val" style="color:var(--success);">--</div>
+        <p id="avg-clarity-text" style="font-size:12px; color:var(--muted);">Complete a simulation to see your score.</p>
     </div>
     <div class="stats-card">
         <div class="stats-card-header"><span>Filler Words</span></div>
-        <div class="stats-value" style="color:var(--warning);">82</div>
-        <p style="font-size:12px; color:var(--muted);">You use "um" and "like" frequently. Aim for <50.</p>
+        <div class="stats-value" id="avg-filler-val" style="color:var(--warning);">--</div>
+        <p id="avg-filler-text" style="font-size:12px; color:var(--muted);">Complete a simulation to see your analytics.</p>
+    </div>
+  </div>
+  </div>
+
+  <!-- Selection Modal Slides -->
+  <div class="setup-modal" id="setup-modal">
+    <div class="setup-content">
+      <button class="close-modal" onclick="closeSetup()">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+
+      <!-- Slide 1: Role -->
+      <div class="setup-slide active" id="slide-role">
+        <div class="setup-header">
+          <h2>Select Target Role</h2>
+          <p>The AI will calibrate its questions to this specific career track.</p>
+        </div>
+        <div class="card-grid" id="role-options">
+          <div class="select-card" onclick="selectRole('Frontend Engineer', this)">
+            <h4>Frontend Engineer</h4>
+            <p>React, UI Architecture, Performance</p>
+          </div>
+          <div class="select-card" onclick="selectRole('Backend Engineer', this)">
+            <h4>Backend Engineer</h4>
+            <p>Node.js, Databases, Scalability</p>
+          </div>
+          <div class="select-card" onclick="selectRole('Fullstack Developer', this)">
+            <h4>Fullstack Developer</h4>
+            <p>End-to-end integration, APIs</p>
+          </div>
+          <div class="select-card" onclick="selectRole('Product Manager', this)">
+            <h4>Product Manager</h4>
+            <p>Strategy, Roadmap, User Centricity</p>
+          </div>
+        </div>
+        <div class="setup-footer">
+          <div class="step-dots"><div class="dot active"></div><div class="dot"></div></div>
+          <button class="btn-next" onclick="moveSlide('slide-final')">Final Step &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Final Slide: Confirmation -->
+      <div class="setup-slide" id="slide-final">
+        <div class="setup-header">
+          <h2>Ready to start?</h2>
+          <p>Review your session configuration below.</p>
+        </div>
+        <div style="background:var(--bg-gray); padding:24px; border-radius:20px; border:1px solid var(--border); margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between;">
+            <span style="font-size:13px; color:var(--muted);">TARGET ROLE</span>
+            <span id="final-role" style="font-weight:700; color:var(--text-dark);">---</span>
+          </div>
+        </div>
+        <div class="setup-footer">
+          <button class="btn-back" onclick="moveSlide('slide-role', true)">&larr; Back</button>
+          <div class="step-dots"><div class="dot"></div><div class="dot active"></div></div>
+          <button class="btn-next" style="background:var(--blue);" onclick="confirmAndLaunch()">Launch Simulator</button>
+        </div>
+      </div>
     </div>
   </div>
 </main>
@@ -445,8 +562,156 @@
   }
 
   function startNewInterview() {
-    window.location.href = 'simulator.html';
+    document.getElementById('setup-modal').classList.add('active');
   }
+
+  function closeSetup() {
+    document.getElementById('setup-modal').classList.remove('active');
+  }
+
+  let selectedRole = '';
+  let selectedCompany = '';
+
+  function selectRole(role, el) {
+    selectedRole = role;
+    document.querySelectorAll('#role-options .select-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('final-role').textContent = role;
+  }
+
+  function selectCompany(company, el) {
+    selectedCompany = company;
+    document.querySelectorAll('#company-options .select-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('final-company').textContent = company;
+  }
+
+  function moveSlide(id, isBack = false) {
+    if (!isBack && id === 'slide-final' && !selectedRole) return alert("Please select a role first!");
+
+    document.querySelectorAll('.setup-slide').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function confirmAndLaunch() {
+    const finalCompany = 'General'; 
+    window.location.href = `simulator.html?role=${encodeURIComponent(selectedRole)}&company=${encodeURIComponent(finalCompany)}`;
+  }
+
+  // Simulation Logic
+  async function fetchSimulations() {
+    const userId = localStorage.getItem('user_email') || 'demo_user';
+    try {
+      const response = await fetch('http://localhost:8000/api/interview/all', {
+        headers: { 'user-id': userId }
+      });
+      const data = await response.json();
+      
+      // Update Real Stats
+      if (data.length > 0) {
+        const completedSessions = data.filter(d => d.status === 'completed');
+        if (completedSessions.length > 0) {
+          const totalScore = completedSessions.reduce((acc, item) => acc + (item.overallScore || 0), 0);
+          const avgScore = Math.round(totalScore / completedSessions.length);
+          
+          document.getElementById('avg-score-val').textContent = `${avgScore}%`;
+          document.getElementById('avg-score-progress').style.width = `${avgScore}%`;
+          
+          // Calculate diff from the previous completed session
+          // Calculate Clarity & Fillers
+          let totalClarity = 0;
+          let totalFillers = 0;
+          let metricSessions = 0;
+
+          completedSessions.forEach(s => {
+            try {
+              const fb = JSON.parse(s.feedback);
+              if (fb.metrics) {
+                totalClarity += (fb.metrics.clarity || fb.metrics.communication || 0);
+                totalFillers += (fb.metrics.fillerCount || 0);
+                metricSessions++;
+              }
+            } catch(e) {}
+          });
+
+          if (metricSessions > 0) {
+            const avgClarity = (totalClarity / metricSessions).toFixed(1);
+            const avgFillers = Math.round(totalFillers / metricSessions);
+
+            const clarityLabel = avgClarity >= 8 ? 'High' : (avgClarity >= 5 ? 'Medium' : 'Needs Focus');
+            const clarityColor = avgClarity >= 8 ? 'var(--success)' : (avgClarity >= 5 ? 'var(--warning)' : 'var(--danger)');
+
+            document.getElementById('avg-clarity-val').textContent = clarityLabel;
+            document.getElementById('avg-clarity-val').style.color = clarityColor;
+            document.getElementById('avg-clarity-text').textContent = `Avg Score: ${avgClarity}/10 — Based on your last ${metricSessions} sessions.`;
+
+            document.getElementById('avg-filler-val').textContent = avgFillers;
+            document.getElementById('avg-filler-val').style.color = avgFillers < 50 ? 'var(--success)' : (avgFillers < 100 ? 'var(--warning)' : 'var(--danger)');
+            document.getElementById('avg-filler-text').textContent = `Average filler words per session. Aim for <50.`;
+          }
+        }
+      }
+
+      const list = document.getElementById('interview-list');
+      if (data.length === 0) {
+        list.innerHTML = '<div style="padding:40px; text-align:center; color:var(--muted); font-size:14px;">No simulations found. Start one above!</div>';
+        return;
+      }
+
+      list.innerHTML = data.map(item => `
+        <div class="interview-row" onclick="viewSimulation('${item._id}')">
+          <div class="role-info">
+            <div class="comp-logo">${item.company.charAt(0)}</div>
+            <div class="role-details">
+              <h4>${item.company} — ${item.role}</h4>
+              <p>${item.status === 'completed' ? 'Finished' : 'In Progress'} Simulation</p>
+            </div>
+          </div>
+          <div class="score-badge">
+            <div class="score-val">${item.overallScore}/100</div>
+            <div class="score-date">${new Date(item.createdAt).toLocaleDateString()}</div>
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      console.error(err);
+      document.getElementById('interview-list').innerHTML = '<div style="padding:40px; text-align:center; color:var(--error); font-size:14px;">Failed to load simulations.</div>';
+    }
+  }
+
+  async function viewSimulation(id) {
+    try {
+      const response = await fetch(`http://localhost:8000/api/interview/${id}`);
+      const item = await response.json();
+
+      document.getElementById('modal-title').textContent = `${item.company} — ${item.role}`;
+      document.getElementById('modal-date').textContent = new Date(item.createdAt).toLocaleString();
+      document.getElementById('modal-score').textContent = `${item.overallScore}/100`;
+      document.getElementById('modal-feedback').textContent = item.feedback || "No feedback available for this session.";
+
+      const transcriptEl = document.getElementById('modal-transcript');
+      if (item.transcript && item.transcript.length > 0) {
+        transcriptEl.innerHTML = item.transcript.slice(0, 4).map(t => `
+          <div class="transcript-item ${t.role === 'ai' ? 'transcript-ai' : 'transcript-user'}">
+            <strong>${t.role.toUpperCase()}:</strong> ${t.content}
+          </div>
+        `).join('');
+      } else {
+        transcriptEl.innerHTML = '<p style="color:var(--muted); font-size:12px;">No transcript data available.</p>';
+      }
+
+      document.getElementById('detail-modal').classList.add('active');
+    } catch (err) {
+      alert("Error loading details");
+    }
+  }
+
+  function closeDetailModal() {
+    document.getElementById('detail-modal').classList.remove('active');
+  }
+
+  // Initial Fetch
+  fetchSimulations();
 </script>
 
 </body>

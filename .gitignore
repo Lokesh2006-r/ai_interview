@@ -2,6 +2,11 @@
 .env
 backend/.env
 
+# Node.js
+node_modules/
+backend/node_modules/
+package-lock.json
+
 # Python
 backend/venv/
 __pycache__/
@@ -15,3 +20,5 @@ __pycache__/
 # OS Files
 .DS_Store
 Thumbs.db
+*.log
+*.txt

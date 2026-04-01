@@ -3,39 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Resume Lab — Bossed AI</title>
+  <title>Resume Lab — Hirvo AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --blue: #2563eb;
-      --indigo: #4f46e5;
+      --blue-dark: #0f172a;
       --blue-light: #eff6ff;
       --bg: #ffffff;
       --bg-gray: #f8fafc;
       --bg-card: #ffffff;
-      --text: #374151;
-      --text-dark: #111827;
-      --muted: #6b7280;
-      --border: #e2e8f0;
+      --text: #4b5563;
+      --text-dark: #0f172a;
+      --muted: #94a3b8;
+      --border: #f1f5f9;
       --success: #10b981;
-      --sidebar-width: 260px;
-      --sidebar-bg: #ffffff;
+      --radius-lg: 28px;
+      --radius-md: 16px;
     }
 
     [data-theme="dark"] {
       --bg: #09090b;
       --bg-gray: #020617;
       --bg-card: #111827;
-      --sidebar-bg: #0f172a;
       --text: #94a3b8;
       --text-dark: #f8fafc;
       --muted: #64748b;
       --border: #1e293b;
-      --blue-light: rgba(37, 99, 235, 0.1);
+      --blue-light: rgba(37, 99, 235, 0.15);
     }
 
     body {
@@ -43,182 +41,186 @@
       background: var(--bg-gray);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
+      display: flex; flex-direction: column;
       -webkit-font-smoothing: antialiased;
       transition: background 0.3s, color 0.3s;
     }
 
-    /* Sidebar Navigation (Constant across all app pages) */
-    aside {
-      width: var(--sidebar-width); background: var(--sidebar-bg); border-right: 1px solid var(--border);
-      height: 100vh; display: flex; flex-direction: column;
-      position: fixed; left: 0; top: 0; z-index: 100;
+    .top-nav {
+      height: 72px;
+      padding: 0 5%;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
       transition: background 0.3s, border 0.3s;
     }
-    .sidebar-header { padding: 24px 20px; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--text-dark); text-decoration: none; }
-    .logo-icon { width: 28px; height: 28px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-    .logo-icon svg { width: 14px; height: 14px; fill: #fff; }
-    
-    .nav-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
-    .nav-item {
-      display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px;
-      text-decoration: none; font-size: 14px; font-weight: 500; color: var(--muted); transition: 0.2s;
+    [data-theme="dark"] .top-nav { background: rgba(9, 9, 11, 0.8); }
+
+    .theme-icon-btn {
+      width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--bg-card); color: var(--text-dark);
+      cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
     }
-    .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 600; }
-    .nav-item:hover { background: var(--blue-light); color: var(--blue); }
-    .icon { width: 18px; height: 18px; }
+    .theme-icon-btn:hover { border-color: var(--blue); transform: scale(1.05); }
+    .theme-icon-btn svg { width: 18px; height: 18px; }
+
+    .nav-left { display: flex; align-items: center; gap: 40px; }
+    
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 900; font-size: 20px; color: var(--text-dark);
+      text-decoration: none;
+      letter-spacing: -1px;
+    }
+
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    
+    .nav-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: var(--radius-md);
+      text-decoration: none; font-size: 14px; font-weight: 600;
+      color: var(--text); transition: all 0.2s;
+    }
+    .nav-link:hover { background: var(--bg-gray); color: var(--text-dark); }
+    .nav-link.active { background: var(--blue-light); color: var(--blue); }
+
+    .nav-right { display: flex; align-items: center; gap: 16px; }
 
     main {
-      flex: 1; margin-left: var(--sidebar-width);
-      padding: 40px; display: flex; flex-direction: column; gap: 32px;
+      flex: 1;
       max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 60px 5%;
+      display: flex; flex-direction: column; gap: 40px;
     }
 
     .header-section { margin-bottom: 8px; }
-    .header-section h1 { font-size: 28px; font-weight: 800; color: var(--text-dark); }
-    .header-section p { font-size: 15px; color: var(--muted); margin-top: 6px; }
+    .header-section h1 { font-size: 32px; font-weight: 900; color: var(--text-dark); letter-spacing: -1px; }
+    .header-section p { font-size: 16px; color: var(--muted); margin-top: 6px; font-weight: 500; }
 
     /* ===== UPLOAD AREA ===== */
     .upload-container {
-      background: var(--bg-card); border: 2px dashed var(--border); border-radius: 24px;
-      padding: 60px 40px; text-align: center;
+      background: var(--bg-card); border: 2px dashed var(--border); border-radius: var(--radius-lg);
+      padding: 80px 40px; text-align: center;
       display: flex; flex-direction: column; align-items: center;
-      transition: all 0.2s; cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
     }
-    .upload-container:hover { border-color: var(--blue); background: var(--blue-light); }
+    .upload-container:hover { border-color: var(--blue); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.04); }
     
     .upload-icon {
-      width: 64px; height: 64px; background: var(--blue-light); border-radius: 16px;
+      width: 64px; height: 64px; background: var(--blue-light); border-radius: 20px;
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 20px; color: var(--blue);
+      margin-bottom: 24px; color: var(--blue);
     }
-    .upload-container h3 { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
-    .upload-container p { font-size: 14px; color: var(--muted); }
+    .upload-container h3 { font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+    .upload-container p { font-size: 15px; color: var(--muted); font-weight: 500; }
 
-    /* ===== ANALYSIS VIEW (Hidden initially) ===== */
+    /* ===== ANALYSIS VIEW ===== */
     .analysis-view {
-      display: none; background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 24px; padding: 40px;
+      display: none; background: var(--bg-card); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 48px; text-align: center;
     }
+    .analysis-view h3 { font-size: 20px; font-weight: 800; color: var(--text-dark); }
     .progress-track {
-      height: 8px; background: var(--bg-gray); border-radius: 4px; overflow: hidden;
-      margin: 24px 0 12px;
+      height: 10px; background: var(--bg-gray); border-radius: 5px; overflow: hidden;
+      margin: 32px 0 16px;
     }
     .progress-bar {
-      width: 0%; height: 100%; background: var(--blue); border-radius: 4px;
+      width: 0%; height: 100%; background: var(--blue); border-radius: 5px;
       transition: width 0.5s ease;
     }
-    .status-text { font-size: 14px; font-weight: 600; color: var(--blue); }
+    .status-text { font-size: 14px; font-weight: 700; color: var(--blue); text-transform: uppercase; }
 
-    /* ===== RESULTS VIEW (Hidden initially) ===== */
+    /* ===== RESULTS VIEW ===== */
     .results-view {
-      display: none; flex-direction: column; gap: 24px;
-      animation: fadeIn 0.6s ease both;
+      display: none; flex-direction: column; gap: 32px;
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     .perfect-match {
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-      border-radius: 24px; padding: 32px; color: #fff;
+      background: var(--blue-dark);
+      border-radius: var(--radius-lg); padding: 40px; color: #fff;
       display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
     }
-    [data-theme="dark"] .perfect-match { background: linear-gradient(135deg, #2563eb 0%, #1e1b4b 100%); }
     
-    .match-info h2 { font-size: 32px; font-weight: 800; margin-bottom: 4px; }
-    .match-info span { font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 600; }
+    .match-info h2 { font-size: 32px; font-weight: 900; margin-bottom: 6px; letter-spacing: -1px; }
+    .match-info span { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
     
     .match-score {
-        text-align: center; background: rgba(255,255,255,0.1); padding: 16px 24px; border-radius: 20px;
-        border: 1px solid rgba(255,255,255,0.2);
+        text-align: center; background: rgba(255,255,255,0.08); padding: 20px 32px; border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
     }
-    .match-score div { font-size: 36px; font-weight: 900; }
-    .match-score span { font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .match-score div { font-size: 44px; font-weight: 900; letter-spacing: -1.5px; }
+    .match-score span { font-size: 11px; font-weight: 800; text-transform: uppercase; opacity: 0.7; }
 
     .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .res-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; padding: 24px; }
-    .res-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--text-dark); }
+    .res-card { 
+      background: var(--bg-card); border: 1.5px solid var(--border); border-radius: var(--radius-lg); 
+      padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    }
+    .res-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 24px; color: var(--text-dark); }
 
     .company-list { display: flex; flex-direction: column; gap: 12px; }
     .comp-item {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 12px 16px; background: var(--bg-gray); border-radius: 12px;
-        border: 1px solid var(--border);
+        padding: 16px 20px; background: var(--bg-gray); border-radius: 16px;
+        border: 1.5px solid var(--border);
     }
-    .comp-name { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 700; color: var(--text-dark); }
-    .comp-logo { width: 32px; height: 32px; border-radius: 8px; background: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; box-shadow: 0 2px 4px rgba(0,0,0,0.05); color: #000; }
+    .comp-name { display: flex; align-items: center; gap: 14px; font-size: 14px; font-weight: 700; color: var(--text-dark); }
+    .comp-logo { 
+      width: 36px; height: 36px; border-radius: 10px; background: #fff; 
+      display: flex; align-items: center; justify-content: center; font-weight: 900; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05); color: #000; font-size: 16px;
+    }
 
     .skill-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-    .pill { padding: 6px 12px; background: var(--blue-light); color: var(--blue); border-radius: 99px; font-size: 12px; font-weight: 600; }
-
-    .theme-icon-btn {
-      width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--bg-card); color: var(--text-dark);
-      cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
-    }
-    .theme-icon-btn:hover { background: var(--bg-gray); border-color: var(--blue); transform: translateY(-2px); }
-    .theme-icon-btn svg { width: 18px; height: 18px; }
+    .pill { padding: 8px 16px; background: var(--blue-light); color: var(--blue); border-radius: 12px; font-size: 13px; font-weight: 700; }
 
     .btn-action {
-        width: 100%; padding: 14px; border-radius: 12px; border: none;
-        background: var(--blue); color: #fff; font-size: 15px; font-weight: 700;
-        cursor: pointer; transition: 0.2s; margin-top: 10px;
+        width: 100%; padding: 16px; border-radius: 16px; border: none;
+        background: var(--blue-dark); color: #fff; font-size: 15px; font-weight: 800;
+        cursor: pointer; transition: all 0.2s; margin-top: 12px;
     }
-    .btn-action:hover { background: var(--indigo); transform: translateY(-2px); }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+
 
   </style>
 </head>
 <body>
 
-<aside>
-  <div class="sidebar-header">
-    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></div>
-    Bossed
-  </div>
-  <nav class="nav-list">
-    <a href="dashboard.html" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="index.html" class="nav-brand">
+      Hirvo AI
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Home
-    </a>
-    <a href="dashboard.html#recent-simulations" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+      </a>
+      <a href="dashboard.html#recent-simulations" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
         Interviews
-    </a>
-    <a href="intelligence.html" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-        Intelligence
-    </a>
-    <a href="resume-lab.html" class="nav-item active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </a>
+      <a href="resume-lab.html" class="nav-link active">
         Resume Lab
-    </a>
-    <a href="resume-builder.html" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-        Resume Builder
-    </a>
-    <a href="pricing.html" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Pricing
-    </a>
-  </nav>
-  <div style="padding: 20px; border-top: 1px solid var(--border);">
-    <a href="index.html" class="nav-item" style="color:var(--error);" onclick="localStorage.clear()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Log Out
-    </a>
+      </a>
+    </div>
   </div>
-</aside>
+
+  <div class="nav-right">
+    <!-- Navigation kept minimalist for tool pages -->
+  </div>
+</nav>
 
 <main>
-  <div class="header-section" style="display:flex; align-items:flex-start; justify-content:space-between;">
-    <div>
-      <h1>Resume Lab</h1>
-      <p>Upload your resume to find your perfect job market fit and target companies.</p>
-    </div>
-    <div style="display:flex; align-items:center;">
-      <button class="theme-icon-btn" id="theme-toggle" title="Toggle Theme">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-      </button>
-    </div>
+  <div class="header-section">
+    <h1>Resume Lab</h1>
+    <p>Upload your resume to find your perfect job market fit and target companies.</p>
   </div>
 
   <!-- UPLOAD STEP -->
@@ -256,18 +258,10 @@
     <div class="grid-row">
         <div class="res-card">
             <h3>Top Companies for You</h3>
-            <div class="company-list">
+            <div class="company-list" id="company-list">
                 <div class="comp-item">
                     <div class="comp-name"><div class="comp-logo" style="background:#000; color:#fff;">G</div> Google</div>
                     <span style="font-size:12px; font-weight:700; color:var(--success);">High Match</span>
-                </div>
-                <div class="comp-item">
-                    <div class="comp-name"><div class="comp-logo" style="background:#fff; color:#000;">𝕊</div> Stripe</div>
-                    <span style="font-size:12px; font-weight:700; color:var(--success);">High Match</span>
-                </div>
-                <div class="comp-item">
-                    <div class="comp-name"><div class="comp-logo" style="background:#004182; color:#fff;">V</div> Vercel</div>
-                    <span style="font-size:12px; font-weight:700; color:var(--blue);">Good Match</span>
                 </div>
             </div>
             <button class="btn-action">View Open Roles &rarr;</button>
@@ -277,18 +271,11 @@
             <h3>Identified Skills</h3>
             <div class="skill-pills" id="skill-pills">
                 <span class="pill">JavaScript</span>
-                <span class="pill">React.js</span>
-                <span class="pill">Next.js</span>
-                <span class="pill">Tailwind CSS</span>
-                <span class="pill">Node.js</span>
-                <span class="pill">Architecture</span>
-                <span class="pill">Product Design</span>
             </div>
             <div style="margin-top:24px;">
                 <h4 style="font-size:13px; margin-bottom:10px;">Missing Requirements</h4>
-                <div class="skill-pills">
+                <div class="skill-pills" id="missing-pills">
                     <span class="pill" style="background:#fef2f2; color:#ef4444;">System Scaling</span>
-                    <span class="pill" style="background:#fef2f2; color:#ef4444;">Team Leadership</span>
                 </div>
             </div>
         </div>
@@ -329,46 +316,90 @@
     document.getElementById('file-input').click();
   }
 
-  function startAnalysis() {
+  async function startAnalysis() {
+    const fileInput = document.getElementById('file-input');
+    if (!fileInput.files.length) return;
+
     document.getElementById('step-upload').style.display = 'none';
     document.getElementById('step-analysis').style.display = 'block';
     
-    let progress = 0;
     const bar = document.getElementById('p-bar');
     const text = document.getElementById('p-text');
     const status = document.getElementById('analysis-text');
     
-    const steps = [
-      "Extracting text from PDF...",
-      "Analyzing skill frequency...",
-      "Matching with 50,000+ job roles...",
-      "Identifying top target companies...",
-      "Generating career roadmap..."
-    ];
-
+    // UI Progress Simulation while fetching
+    let progress = 0;
     const intv = setInterval(() => {
-      progress += Math.random() * 15;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(intv);
-        showResults();
+      if (progress < 90) {
+        progress += Math.random() * 5;
+        bar.style.width = progress + '%';
+        text.textContent = Math.floor(progress) + '% Completed';
       }
-      bar.style.width = progress + '%';
-      text.textContent = Math.floor(progress) + '% Completed';
+    }, 300);
+
+    const formData = new FormData();
+    formData.append('resume', fileInput.files[0]);
+
+    try {
+      const res = await fetch('http://localhost:8000/api/resume/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
       
-      const stepIdx = Math.floor((progress / 100) * steps.length);
-      status.textContent = steps[stepIdx] || steps[steps.length-1];
-    }, 400);
+      clearInterval(intv);
+      bar.style.width = '100%';
+      text.textContent = '100% Completed';
+      
+      if (data.success) {
+        showResults(data);
+      } else {
+        alert("Error: " + data.detail);
+        location.reload();
+      }
+    } catch (err) {
+      clearInterval(intv);
+      alert("Backend error: " + err.message);
+      location.reload();
+    }
   }
 
-  function showResults() {
+  function showResults(data) {
     setTimeout(() => {
         document.getElementById('step-analysis').style.display = 'none';
         document.getElementById('step-results').style.display = 'flex';
         
-        // Dynamic Role update from localStorage
-        const userName = localStorage.getItem('user_name') || 'Lokesh';
-        document.getElementById('res-role').textContent = `${userName.split(' ')[0]} - Senior Engineering Lead`;
+        // Populate Header Info
+        document.getElementById('res-role').textContent = data.targetRole || 'Professional Profile';
+        document.getElementById('res-score').textContent = (data.atsScore || 0) + '%';
+        document.querySelector('.perfect-match p').textContent = data.fitAnalysis || data.summary;
+
+        // Populate Skills
+        const skillPills = document.getElementById('skill-pills');
+        skillPills.innerHTML = (data.topSkills || []).map(s => `<span class="pill">${s}</span>`).join('');
+
+        // Populate Missing Skills
+        const missingPills = document.getElementById('missing-pills');
+        missingPills.innerHTML = (data.missingSkills || []).map(s => `<span class="pill" style="background:#fef2f2; color:#ef4444;">${s}</span>`).join('');
+
+        // Populate Top Companies
+        const companyList = document.getElementById('company-list');
+        companyList.innerHTML = (data.topCompanies || ['Google', 'Stripe', 'Vercel']).map((c, i) => {
+            const colors = ['#000', '#fff', '#004182'];
+            const textColors = ['#fff', '#000', '#fff'];
+            const color = colors[i % colors.length];
+            const textColor = textColors[i % textColors.length];
+            return `
+                <div class="comp-item">
+                    <div class="comp-name">
+                        <div class="comp-logo" style="background:${color}; color:${textColor};">${c.charAt(0)}</div> 
+                        ${c}
+                    </div>
+                    <span style="font-size:12px; font-weight:700; color:var(--success);">Match</span>
+                </div>
+            `;
+        }).join('');
+        
     }, 600);
   }
 </script>

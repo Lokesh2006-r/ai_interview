@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Resume Builder — Bossed AI</title>
+  <title>Resume Builder — Hirvo AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -12,30 +12,29 @@
 
     :root {
       --blue: #2563eb;
-      --blue-dark: #1d4ed8;
+      --blue-dark: #0f172a;
       --blue-light: #eff6ff;
       --bg: #ffffff;
       --bg-gray: #f8fafc;
       --bg-card: #ffffff;
-      --text: #475569;
+      --text: #4b5563;
       --text-dark: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #f1f5f9;
+      --radius-lg: 28px;
+      --radius-md: 16px;
       --sidebar-width: 260px;
-      --sidebar-bg: #ffffff;
-      --resume-header-bg: #333333;
     }
 
     [data-theme="dark"] {
       --bg: #09090b;
       --bg-gray: #020617;
       --bg-card: #111827;
-      --sidebar-bg: #0f172a;
       --text: #94a3b8;
       --text-dark: #f8fafc;
       --muted: #64748b;
       --border: #1e293b;
-      --blue-light: rgba(37, 99, 235, 0.1);
+      --blue-light: rgba(37, 99, 235, 0.15);
     }
 
     body {
@@ -44,20 +43,26 @@
       color: var(--text);
       min-height: 100vh;
       display: flex;
+      -webkit-font-smoothing: antialiased;
       transition: background 0.3s, color 0.3s;
       overflow-x: hidden;
     }
 
     /* ===== SIDEBAR ===== */
     aside {
-      width: var(--sidebar-width); background: var(--sidebar-bg); border-right: 1px solid var(--border);
+      width: var(--sidebar-width); background: var(--bg-card); border-right: 1px solid var(--border);
       height: 100vh; display: flex; flex-direction: column;
-      position: fixed; left: 0; top: 0; z-index: 100;
+      position: fixed; left: 0; top: 0; z-index: 1000;
       transition: background 0.3s, border 0.3s;
     }
-    .sidebar-header { padding: 24px 20px; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--text-dark); text-decoration: none; }
-    .logo-icon { width: 28px; height: 28px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-    .logo-icon svg { width: 14px; height: 14px; fill: #fff; }
+    .sidebar-header {
+      padding: 32px 24px;
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 900; font-size: 20px; color: var(--text-dark);
+      text-decoration: none; letter-spacing: -1px;
+    }
+    .logo-icon { width: 32px; height: 32px; background: var(--blue); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .logo-icon svg { width: 16px; height: 16px; fill: #fff; }
     
     .nav-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
     .nav-item {
@@ -89,8 +94,8 @@
     
     .ai-list { list-style: none; margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
     .ai-list li { font-size: 13px; display: flex; gap: 8px; align-items: flex-start; }
-    .ai-list li::before { content: '✨'; font-size: 12px; }
-    .ai-list.weak li::before { content: '⚠️'; }
+    .ai-list li::before { content: '*'; font-size: 12px; }
+    .ai-list.weak li::before { content: '!'; }
 
     .btn-ai {
         width: 100%; padding: 12px; background: var(--blue); color: #fff;
@@ -235,10 +240,7 @@
 
 <aside>
     <a href="dashboard.html" class="sidebar-header">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-      </div>
-      Bossed
+      Hirvo AI
     </a>
   
     <nav class="nav-list">
@@ -255,25 +257,16 @@
         Intelligence
       </a>
       <a href="resume-lab.html" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         Resume Lab
       </a>
       <a href="resume-builder.html" class="nav-item active">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
         Resume Builder
       </a>
-      <a href="pricing.html" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Pricing
-      </a>
     </nav>
 </aside>
 
 <main>
-  <button class="theme-icon-btn" id="theme-toggle" title="Toggle Theme">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon" width="18" height="18"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-  </button>
-
   <div class="builder-container">
     <!-- INPUT AREA -->
     <div class="form-pane">
@@ -361,8 +354,6 @@
         </div>
         <div class="zoom-wrapper" id="zoom-wrap" style="transform: scale(0.75);">
             <div class="resume-a4" id="resume-output" data-template="modern-dark">
-                <!-- Inner structure remains the same -->
-                 <!-- HEADER (Template Switchable parts in sub-classes) -->
                  <div class="r-header">
                     <div class="name-block">
                         <div class="name-flex">
@@ -374,14 +365,13 @@
                         </div>
                     </div>
                     <div class="contact-info">
-                   <div class="c-item"><div class="c-icon">📞</div><span id="out-phone">+123-456-7890</span></div>
-                   <div class="c-item"><div class="c-icon">✉</div><span id="out-email">hello@reallygreatsite.com</span></div>
-                   <div class="c-item"><div class="c-icon">📍</div><span id="out-location">123 Anywhere St., Any City</span></div>
+                   <div class="c-item"><div class="c-icon">P</div><span id="out-phone">+123-456-7890</span></div>
+                   <div class="c-item"><div class="c-icon">M</div><span id="out-email">hello@reallygreatsite.com</span></div>
+                   <div class="c-item"><div class="c-icon">L</div><span id="out-location">123 Anywhere St., Any City</span></div>
                 </div>
              </div>
 
              <div class="r-content">
-                <!-- ABOUT -->
                 <div class="r-section">
                     <div class="r-sec-title">About Me</div>
                     <div class="r-sec-body" id="out-about">
@@ -389,7 +379,6 @@
                     </div>
                 </div>
 
-                <!-- EXPERIENCE -->
                 <div class="r-section">
                     <div class="r-sec-title">Experience</div>
                     <div class="r-sec-body" id="out-experience">
@@ -401,7 +390,6 @@
                     </div>
                 </div>
 
-                <!-- EDUCATION -->
                 <div class="r-section">
                     <div class="r-sec-title">Education</div>
                     <div class="r-sec-body" id="out-education">
@@ -412,7 +400,6 @@
                     </div>
                 </div>
 
-                <!-- FOOTER ROW -->
                 <div style="display:flex; gap: 40px;">
                     <div style="flex:1;">
                         <h3 style="font-size:16px; font-weight:800; margin-bottom:12px;">Expertise</h3>
@@ -432,16 +419,17 @@
                 </div>
              </div>
         </div>
+    </div>
     <!-- AI PANEL -->
     <div class="ai-pane">
         <div class="section-title">AI Assistant</div>
         
         <button class="btn-ai" onclick="generateAISummary()">
-            <span>🤖</span> Generate AI Summary
+            Generate AI Summary
         </button>
 
         <button class="btn-ai" style="background:#0f172a;" onclick="analyzeWithAI()">
-            <span>🔍</span> Analyze Resume Quality
+            Analyze Resume Quality
         </button>
 
         <div id="ai-results" style="display:none; margin-top:20px;">
@@ -529,7 +517,7 @@
             email: document.getElementById('in-email').value,
             location: document.getElementById('in-location').value,
             about: document.getElementById('in-about').value,
-            experience: [], // Loop and collect
+            experience: [], 
             education: [],
             skills: document.getElementById('in-skills').value.split(','),
         };
@@ -540,7 +528,7 @@
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify({ template: document.getElementById('resume-output').dataset.template, data })
             });
-            if(res.ok) alert("✅ Resume saved successfully!");
+            if(res.ok) alert("Resume saved successfully!");
         } catch(e) { console.error(e); }
     }
 
@@ -556,7 +544,7 @@
             const data = await res.json();
             document.getElementById('in-about').value = data.summary;
             updatePreview();
-        } finally { btn.innerHTML = '<span>🤖</span> Generate AI Summary'; }
+        } finally { btn.innerHTML = 'Generate AI Summary'; }
     }
 
     async function analyzeWithAI() {
@@ -589,8 +577,21 @@
         container.appendChild(div);
     }
 
+    function addExp() {
+        const container = document.getElementById('exp-fields');
+        const div = document.createElement('div');
+        div.className = 'exp-entry';
+        div.style.marginTop = '20px';
+        div.innerHTML = `
+            <div class="input-group"><label>Company</label><input type="text" class="in-exp-comp" placeholder="Company Name" oninput="updatePreview()"/></div>
+            <div class="input-group"><label>Years</label><input type="text" class="in-exp-dates" placeholder="2017 - 2020" oninput="updatePreview()"/></div>
+            <div class="input-group"><label>Job Position</label><input type="text" class="in-exp-role" placeholder="Marketing Lead" oninput="updatePreview()"/></div>
+            <div class="input-group"><label>Description</label><textarea class="in-exp-desc" rows="3" placeholder="Key achievements..." oninput="updatePreview()"></textarea></div>
+        `;
+        container.appendChild(div);
+    }
+
     function updatePreview() {
-        // Simple data binding
         document.getElementById('out-name').textContent = document.getElementById('in-name').value || 'MORGAN MAXWELL';
         document.getElementById('out-role').textContent = document.getElementById('in-role').value || 'Marketing Manager';
         document.getElementById('out-phone').textContent = document.getElementById('in-phone').value || '+123-456-7890';
@@ -598,7 +599,6 @@
         document.getElementById('out-location').textContent = document.getElementById('in-location').value || '123 Anywhere St., Any City';
         document.getElementById('out-about').textContent = document.getElementById('in-about').value || 'Brief professional summary...';
 
-        // Experience
         const expItems = document.querySelectorAll('.exp-entry');
         let expHtml = '';
         expItems.forEach(item => {
@@ -616,7 +616,6 @@
         });
         document.getElementById('out-experience').innerHTML = expHtml;
 
-        // Education
         const eduItems = document.querySelectorAll('.edu-entry');
         let eduHtml = '';
         eduItems.forEach(item => {
@@ -632,7 +631,6 @@
         });
         document.getElementById('out-education').innerHTML = eduHtml;
 
-        // Skills
         const skillsVal = document.getElementById('in-skills').value;
         const skillsArr = skillsVal.split(',').map(s => s.trim()).filter(s => s !== '');
         if (skillsArr.length > 0) {
@@ -640,31 +638,14 @@
         }
     }
 
-    // Theme Logic
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('click', () => {
-        const body = document.body;
-        const current = body.getAttribute('data-theme');
-        const next = current === 'light' ? 'dark' : 'light';
-        body.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        updateThemeIcon(next);
-    });
-
-    function updateThemeIcon(theme) {
-        const icon = document.getElementById('theme-icon');
-        if (theme === 'dark') {
-            icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>';
-        } else {
-            icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
-        }
+    function updateThemeUI(theme) {
+        // Shared theme handling
     }
 
     window.addEventListener('load', () => {
         initTemplates();
-        const saved = localStorage.getItem('theme') || 'light';
-        document.body.setAttribute('data-theme', saved);
-        updateThemeIcon(saved);
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
         updatePreview();
     });
 </script>
