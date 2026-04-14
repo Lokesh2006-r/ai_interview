@@ -45,22 +45,39 @@
       background: var(--bg-gray);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
+      display: flex; flex-direction: column;
       -webkit-font-smoothing: antialiased;
       transition: background 0.3s, color 0.3s;
     }
 
-    /* Sidebar logic */
-    aside {
-      width: var(--sidebar-width);
-      background: var(--bg-card);
-      border-right: 1px solid var(--border);
-      height: 100vh;
-      display: flex; flex-direction: column;
-      position: fixed; left: 0; top: 0;
-      z-index: 100;
+    /* ===== TOP NAVIGATION ===== */
+    .top-nav {
+      height: 72px;
+      padding: 0 5%;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
       transition: background 0.3s, border 0.3s;
     }
+    [data-theme="dark"] .top-nav { background: rgba(9, 9, 11, 0.8); }
+
+    .nav-left { display: flex; align-items: center; gap: 40px; }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 900; font-size: 20px; color: var(--text-dark);
+      text-decoration: none; letter-spacing: -1px;
+    }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: var(--radius-md);
+      text-decoration: none; font-size: 14px; font-weight: 600;
+      color: var(--text); transition: all 0.2s;
+    }
+    .nav-link:hover { background: var(--bg-gray); color: var(--text-dark); }
+    .nav-link.active { background: var(--blue-light); color: var(--blue); }
 
     .sidebar-header {
       padding: 32px 24px;
@@ -87,8 +104,9 @@
     .nav-item.active { background: var(--blue-light); color: var(--blue); }
 
     main {
-      flex: 1; margin-left: var(--sidebar-width);
+      flex: 1;
       padding: 48px 60px; display: flex; flex-direction: column; gap: 40px;
+      max-width: 1400px; width: 100%; margin: 0 auto;
     }
 
     .header-info h1 { font-size: 32px; font-weight: 900; color: var(--text-dark); letter-spacing: -1px; }
@@ -153,37 +171,27 @@
 </head>
 <body>
 
-<aside>
-  <div class="sidebar-header">
-    Hirvo AI
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="dashboard.html" class="nav-brand">
+      Hirvo AI
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">
+        Home
+      </a>
+      <a href="resume-lab.html" class="nav-link">
+        Resume Lab
+      </a>
+      <a href="resume-builder.html" class="nav-link">
+        Resume Builder
+      </a>
+      <a href="intelligence.html" class="nav-link active">
+        Intelligence
+      </a>
+    </div>
   </div>
-
-  <nav class="nav-list">
-    <a href="dashboard.html" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Home
-    </a>
-    <a href="dashboard.html#recent-simulations" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
-      Interviews
-    </a>
-    <a href="intelligence.html" class="nav-item active">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-      Intelligence
-    </a>
-    <a href="resume-lab.html" class="nav-item">
-      Resume Lab
-    </a>
-    <a href="resume-builder.html" class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-      Resume Builder
-    </a>
-  </nav>
-
-  <div style="padding: 20px; border-top: 1px solid var(--border);">
-    <p style="font-size: 11px; color: var(--muted); text-align: center;">Personal Growth Intelligence</p>
-  </div>
-</aside>
+</nav>
 
 <main>
   <header style="display:flex; align-items:flex-start; justify-content:space-between;">

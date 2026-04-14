@@ -83,26 +83,51 @@
       flex: 1; display: flex; overflow: hidden;
     }
 
-    /* Editor Side */
-    .editor-panel {
+    /* Input Side (Tabs) */
+    .input-panel {
       flex: 1; display: flex; flex-direction: column;
       border-right: 1px solid var(--border);
       background: var(--surface);
+      overflow: hidden;
     }
-    .editor-header {
-      height: 48px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 16px;
+    .panel-tabs {
+      height: 52px; border-bottom: 1px solid var(--border);
+      display: flex; background: var(--surface-lighter);
     }
-    .lang-selector { background: var(--surface-lighter); border: 1px solid var(--border); color: var(--text-dark); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-family: inherit; outline: none; }
+    .tab-btn {
+      flex: 1; border: none; background: transparent; color: var(--text-muted);
+      font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s;
+      border-bottom: 3px solid transparent; display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--surface); }
+    .tab-btn:hover:not(.active) { color: var(--text-dark); background: var(--surface); }
 
-    .editor-body { flex: 1; position: relative; padding: 16px; }
+    .panel-content { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .slide { display: none; flex: 1; flex-direction: column; height: 100%; }
+    .slide.active { display: flex; }
+
+    /* Chat Slide */
+    .chat-container { flex: 1; display: flex; flex-direction: column; padding: 16px; background: var(--bg-gray); overflow-y: auto; gap: 16px; scroll-behavior: smooth; }
+    .msg { max-width: 85%; padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.5; position: relative; }
+    .msg.ai { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); color: var(--text-dark); border-bottom-left-radius: 2px; }
+    .msg.user { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 2px; }
+
+    .input-area { padding: 16px; border-top: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; gap: 12px; }
+    .text-input-wrap { display: flex; gap: 12px; }
+    .chat-input { flex: 1; min-height: 44px; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-gray); color: var(--text-dark); font-family: inherit; font-size: 14px; outline: none; resize: none; transition: 0.2s; }
+    .chat-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+    .btn-submit { background: var(--primary); color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+    .btn-submit:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Code Slide */
+    .code-header { height: 40px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; background: var(--bg); border-bottom: 1px solid var(--border); }
+    .code-body { flex: 1; position: relative; overflow: hidden; }
     .code-area { 
-      width: 100%; height: 100%; height: 100%; background: transparent; border: none; outline: none; 
-      color: #94a3b8; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; line-height: 1.6;
-      resize: none;
+      width: 100%; height: 100%; background: var(--surface); border: none; outline: none; 
+      color: var(--text-dark); font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; line-height: 1.6; padding: 16px; resize: none; 
     }
-    .editor-footer { height: 40px; border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; font-size: 12px; color: var(--text-muted); gap: 8px; }
 
     /* Participants Side */
     .video-panel {
@@ -260,23 +285,56 @@
 
   <!-- MAIN INTERVIEW ROOM -->
   <main>
-    <!-- Code Editor Panel -->
-    <div class="editor-panel">
-      <div class="editor-header">
-        <select class="lang-selector">
-          <option>javascript</option>
-          <option>python</option>
-          <option>java</option>
-          <option>cpp</option>
-        </select>
-        <div style="font-size: 11px; color: var(--text-muted); background: #ffffff0a; padding: 4px 8px; border-radius: 4px;">Autosave On</div>
+    <!-- Input & Interaction Panel -->
+    <div class="input-panel">
+      <div class="panel-tabs">
+        <button class="tab-btn active" onclick="switchSlide('chat')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Interview Chat
+        </button>
+        <button class="tab-btn" onclick="switchSlide('code')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+          Code Editor
+        </button>
       </div>
-      <div class="editor-body">
-        <textarea id="code-editor" class="code-area" placeholder="// Write your code here..."></textarea>
-      </div>
-      <div class="editor-footer">
-        <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        The content is automatically accessible to AI. Please let AI know via voice once you are done.
+
+      <div class="panel-content">
+        <!-- Slide 1: Chat Input -->
+        <div class="slide active" id="slide-chat">
+          <div class="chat-container" id="chat-history">
+            <div class="msg ai">Hello! I am your AI interviewer. Let's get started.</div>
+          </div>
+          <div class="input-area">
+            <div class="text-input-wrap">
+              <textarea id="text-input" class="chat-input" placeholder="Type your response here..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault(); submitAnswer();}"></textarea>
+              <button class="btn-submit" id="submit-btn" onclick="submitAnswer()">
+                <span>Submit</span>
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: Coding Input -->
+        <div class="slide" id="slide-code">
+          <div class="code-header">
+            <select class="lang-selector">
+              <option>javascript</option>
+              <option>python</option>
+              <option>java</option>
+              <option>cpp</option>
+            </select>
+            <div style="font-size: 11px; color: var(--text-muted);">Autosave Enabled</div>
+          </div>
+          <div class="code-body">
+            <textarea id="code-editor" class="code-area" placeholder="// Write and optimize your code here..."></textarea>
+          </div>
+          <div class="input-area" style="padding: 12px 16px; border-top: 1px solid var(--border);">
+            <button class="btn-submit" onclick="submitAnswer()" style="width: 100%; justify-content: center;">
+              Submit Code Analysis
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -340,6 +398,21 @@
   let isMuted = false;
   let isCamOff = false;
   let videoStream = null;
+
+  // Interview State (Memory Tracking)
+  let interviewState = {
+    name: localStorage.getItem('user_name') || 'Candidate',
+    role: '',
+    level: 'Intermediate',
+    stage: 'Warm-up',
+    scores: {
+      technical: 0,
+      communication: 0,
+      problem_solving: 0,
+      confidence: 0
+    },
+    history: []
+  };
 
   // Initial Load
   // Global Theme Logic - Managed by load event
@@ -445,13 +518,19 @@
 
   async function startAIConversation() {
     const userName = localStorage.getItem('user_name') || 'Candidate';
-    getAIResponse(`Introduce yourself as an interviewer from ${currentCompany}. My name is ${userName}. Ask me the first professional interview question for the ${currentRole} role.`);
+    getAIResponse(`Introduce yourself briefly as an interviewer from ${currentCompany}. Then, ask me for my name, the role I am applying for, and my experience level (Beginner, Intermediate, or Advanced) to begin the interview.`);
   }
 
   async function getAIResponse(userText) {
     const aiStatus = document.getElementById('ai-status');
+    const submitBtn = document.getElementById('submit-btn');
+    
     aiStatus.textContent = 'Thinking...';
     aiStatus.style.color = 'var(--accent)';
+    if (submitBtn) submitBtn.disabled = true;
+
+    // Simple memory summary generation
+    const memory_summary = interviewState.history.slice(-3).map(h => h.content).join('; ');
 
     try {
       const res = await fetch('http://localhost:8000/api/interview/ask', {
@@ -463,7 +542,10 @@
           context: userText,
           history: interviewHistory,
           interviewId: currentInterviewId,
-          candidateName: localStorage.getItem('user_name') || 'Candidate',
+          candidateName: interviewState.name,
+          level: interviewState.level,
+          stage: interviewState.stage,
+          memory_summary: memory_summary,
           currentCode: document.getElementById('code-editor').value
         })
       });
@@ -473,37 +555,94 @@
       aiStatus.textContent = 'Speaking...';
       aiStatus.style.color = 'var(--green)';
       
+      addMessage('ai', data.answer);
+      
       speakText(data.answer, () => {
         aiStatus.textContent = 'Listening...';
         aiStatus.style.color = 'var(--text-muted)';
+        if (submitBtn) submitBtn.disabled = false;
       });
       
       interviewHistory.push({ role: 'ai', content: data.answer });
+      interviewState.history.push({ role: 'ai', content: data.answer });
+
+      // Dynamic Stage Update Logic (Simple heuristic)
+      if (interviewHistory.length > 4 && interviewState.stage === 'Warm-up') interviewState.stage = 'Technical';
+      if (interviewHistory.length > 10 && interviewState.stage === 'Technical') interviewState.stage = 'Problem-solving';
+      if (interviewHistory.length > 16 && interviewState.stage === 'Problem-solving') interviewState.stage = 'Behavioral';
+
     } catch (err) {
       aiStatus.textContent = 'Error in AI Core';
+      if (submitBtn) submitBtn.disabled = false;
     }
   }
 
+  function switchSlide(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+
+    const btn = [...document.querySelectorAll('.tab-btn')].find(b => b.textContent.toLowerCase().includes(tab));
+    btn.classList.add('active');
+    document.getElementById(`slide-${tab}`).classList.add('active');
+  }
+
+  function addMessage(role, text) {
+    const chat = document.getElementById('chat-history');
+    const msg = document.createElement('div');
+    msg.className = `msg ${role}`;
+    msg.textContent = text;
+    chat.appendChild(msg);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function submitAnswer() {
+    const textInput = document.getElementById('text-input');
+    const codeInput = document.getElementById('code-editor');
+    
+    // Get current value based on active slide
+    const isCodeActive = document.getElementById('slide-code').classList.contains('active');
+    const content = isCodeActive ? codeInput.value : textInput.value;
+
+    if (!content.trim()) return;
+
+    if (!isCodeActive) {
+      addMessage('user', content);
+      textInput.value = '';
+    } else {
+      addMessage('user', '[Code Submitted for Analysis]');
+      switchSlide('chat'); // Switch back to chat to see response
+    }
+
+    interviewHistory.push({ role: 'user', content: content });
+    interviewState.history.push({ role: 'user', content: content });
+    
+    getAIResponse(content);
+  }
+
   function speakText(text, onEnd) {
-    window.speechSynthesis.cancel(); // Stop any current speech
+    window.speechSynthesis.cancel(); 
     
     const utterance = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
     
-    // Prioritize high-quality human voices
+    // ElevenLabs-style voice prioritization: Look for "Natural", "Google", "Online", or "Premium"
     const preferredVoice = voices.find(v => 
-      v.name.includes('Google') || 
       v.name.includes('Natural') || 
+      v.name.includes('Neural') ||
+      v.name.includes('Google US English') || 
       v.name.includes('Microsoft Aria') || 
-      v.name.includes('Premium')
-    ) || voices[0];
+      v.name.includes('Microsoft Guy')
+    ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
 
     utterance.voice = preferredVoice;
-    utterance.rate = 0.95;  // Slightly slower for natural feel
-    utterance.pitch = 1.0; // Standard pitch
+    utterance.rate = 1.0; 
+    utterance.pitch = 1.0; 
+    utterance.volume = 1.0;
     utterance.lang = 'en-US';
     
     utterance.onend = onEnd;
+    utterance.onerror = onEnd; // Handle potential errors gracefully
+    
     window.speechSynthesis.speak(utterance);
   }
 
@@ -528,12 +667,34 @@
   const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
   recognition.continuous = true;
   recognition.interimResults = false;
+  recognition.lang = 'en-US';
 
   recognition.onresult = (event) => {
     let transcript = event.results[event.results.length - 1][0].transcript;
     if (transcript.trim()) {
+      // VISUALLY show transcribed speech in the chat
+      addMessage('user', transcript);
+      
       interviewHistory.push({ role: 'user', content: transcript });
+      interviewState.history.push({ role: 'user', content: transcript });
+      
+      // Confidence detection
+      if (transcript.length < 20) interviewState.scores.confidence = Math.max(0, interviewState.scores.confidence - 1);
+      else interviewState.scores.confidence = Math.min(10, interviewState.scores.confidence + 1);
+
       getAIResponse(transcript);
+    }
+  };
+
+  recognition.onerror = (event) => {
+    console.warn("Speech recognition error:", event.error);
+    if (event.error === 'no-speech') { /* Silence, it's okay but keep going */ }
+  };
+
+  recognition.onend = () => {
+    // Keep it always listening unless session turned off
+    if (sessionActive && !isMuted) {
+      try { recognition.start(); } catch(e) {}
     }
   };
 
@@ -589,9 +750,9 @@
     
     let html = `
       <!-- Metrics Section -->
-      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:40px;">
+      <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:16px; margin-bottom:40px;">
         <div style="background:var(--surface-lighter); padding:20px; border-radius:16px; border:1px solid var(--border); text-align:center;">
-          <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">TECHNICAL</div>
+          <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">TECHNICAL SKILLS</div>
           <div style="font-size:24px; font-weight:800; color:var(--primary);">${feedback.metrics?.technical || 0}/10</div>
         </div>
         <div style="background:var(--surface-lighter); padding:20px; border-radius:16px; border:1px solid var(--border); text-align:center;">
@@ -601,6 +762,10 @@
         <div style="background:var(--surface-lighter); padding:20px; border-radius:16px; border:1px solid var(--border); text-align:center;">
           <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">PROBLEM SOLVING</div>
           <div style="font-size:24px; font-weight:800; color:var(--green);">${feedback.metrics?.problem_solving || 0}/10</div>
+        </div>
+        <div style="background:var(--surface-lighter); padding:20px; border-radius:16px; border:1px solid var(--border); text-align:center;">
+          <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">CONFIDENCE SCORE</div>
+          <div style="font-size:24px; font-weight:800; color:#8b5cf6;">${feedback.metrics?.confidence || 0}/10</div>
         </div>
       </div>
 
@@ -614,15 +779,22 @@
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
         <div>
           <h3 style="font-size:16px; color:var(--green); margin-bottom:12px;">Strengths</h3>
-          <ul style="list-style:none; font-size:14px; line-height:1.6; color:var(--text-muted);">
-            ${(feedback.strengths || []).map(s => `<li style="margin-bottom:8px;">+ ${s}</li>`).join('')}
+          <ul style="list-style:none; font-size:14px; line-height:1.6; color:var(--text-muted); padding:0;">
+            ${(feedback.strengths || []).map(s => `<li style="margin-bottom:8px;">✅ ${s}</li>`).join('')}
           </ul>
         </div>
         <div>
-          <h3 style="font-size:16px; color:var(--accent); margin-bottom:12px;">Areas for Growth</h3>
-          <ul style="list-style:none; font-size:14px; line-height:1.6; color:var(--text-muted);">
-            ${(feedback.improvement || []).map(i => `<li style="margin-bottom:8px;">- ${i}</li>`).join('')}
+          <h3 style="font-size:16px; color:var(--danger); margin-bottom:12px;">Weaknesses</h3>
+          <ul style="list-style:none; font-size:14px; line-height:1.6; color:var(--text-muted); padding:0;">
+            ${(feedback.weaknesses || []).map(w => `<li style="margin-bottom:8px;">❌ ${w}</li>`).join('')}
           </ul>
+        </div>
+      </div>
+
+      <div style="margin-top:32px; background:var(--surface-lighter); padding:24px; border-radius:16px; border:1px solid var(--border);">
+        <h3 style="font-size:18px; margin-bottom:16px;">Improvement Path</h3>
+        <div style="font-size:14px; line-height:1.6; color:var(--text-dark);">
+          ${(feedback.improvement || []).map(i => `<span style="display:inline-block; background:var(--bg); border:1px solid var(--border); padding:4px 12px; border-radius:99px; margin:4px;">${i}</span>`).join('')}
         </div>
       </div>
     `;

@@ -42,76 +42,84 @@
       background: var(--bg-gray);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
+      display: flex; flex-direction: column;
       -webkit-font-smoothing: antialiased;
       transition: background 0.3s, color 0.3s;
       overflow-x: hidden;
     }
 
-    /* ===== SIDEBAR ===== */
-    aside {
-      width: var(--sidebar-width); background: var(--bg-card); border-right: 1px solid var(--border);
-      height: 100vh; display: flex; flex-direction: column;
-      position: fixed; left: 0; top: 0; z-index: 1000;
+    /* ===== TOP NAVIGATION ===== */
+    .top-nav {
+      height: 72px;
+      padding: 0 5%;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 1000;
       transition: background 0.3s, border 0.3s;
     }
-    .sidebar-header {
-      padding: 32px 24px;
-      display: flex; align-items: center; gap: 12px;
+    [data-theme="dark"] .top-nav { background: rgba(9, 9, 11, 0.8); }
+
+    .nav-left { display: flex; align-items: center; gap: 40px; }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
       font-weight: 900; font-size: 20px; color: var(--text-dark);
       text-decoration: none; letter-spacing: -1px;
     }
-    .logo-icon { width: 32px; height: 32px; background: var(--blue); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-    .logo-icon svg { width: 16px; height: 16px; fill: #fff; }
-    
-    .nav-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
-    .nav-item {
-      display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px;
-      text-decoration: none; font-size: 14px; font-weight: 500; color: var(--muted); transition: 0.2s;
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: var(--radius-md);
+      text-decoration: none; font-size: 14px; font-weight: 600;
+      color: var(--text); transition: all 0.2s;
     }
-    .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 600; }
-    .nav-item:hover { background: var(--blue-light); color: var(--blue); }
-    .icon { width: 18px; height: 18px; }
+    .nav-link:hover { background: var(--bg-gray); color: var(--text-dark); }
+    .nav-link.active { background: var(--blue-light); color: var(--blue); }
 
     /* ===== MAIN LAYOUT ===== */
     main {
-      flex: 1; margin-left: var(--sidebar-width);
-      display: flex; flex-direction: column; height: 100vh;
+      flex: 1;
+      display: flex; flex-direction: column; height: calc(100vh - 72px);
     }
 
     .builder-container {
       display: flex; flex: 1; overflow: hidden; position: relative;
     }
 
-    /* AI PANEL */
-    .ai-pane {
-      width: 320px; background: var(--bg); border-left: 1px solid var(--border);
-      overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px;
+    /* STEPPED SIDEBAR */
+    .steps-sidebar {
+      width: 80px; background: var(--bg); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 20px 0; gap: 20px;
     }
-    .ai-card { background: var(--blue-light); border-radius: 16px; padding: 20px; border: 1px solid rgba(37,99,235,0.1); }
-    .ai-score { font-size: 32px; font-weight: 900; color: var(--blue); margin-bottom: 4px; }
-    .ai-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
-    
-    .ai-list { list-style: none; margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .ai-list li { font-size: 13px; display: flex; gap: 8px; align-items: flex-start; }
-    .ai-list li::before { content: '*'; font-size: 12px; }
-    .ai-list.weak li::before { content: '!'; }
-
-    .btn-ai {
-        width: 100%; padding: 12px; background: var(--blue); color: #fff;
-        border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+    .step-icon {
+      width: 44px; height: 44px; border-radius: 14px; background: var(--bg-gray);
+      color: var(--muted); display: flex; align-items: center; justify-content: center;
+      margin: 0 auto; cursor: pointer; transition: 0.3s; position: relative;
     }
-    .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+    .step-icon.active { background: var(--blue-light); color: var(--blue); }
+    .step-icon:hover:not(.active) { background: var(--bg-gray); color: var(--text-dark); }
+    .step-icon::after {
+      content: attr(data-label); position: absolute; left: 60px; background: var(--blue-dark);
+      color: #fff; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700;
+      white-space: nowrap; visibility: hidden; opacity: 0; transition: 0.2s;
+    }
+    .step-icon:hover::after { visibility: visible; opacity: 1; left: 70px; }
 
     /* LEFT: FORM */
     .form-pane {
-      width: 450px; background: var(--bg); border-right: 1px solid var(--border);
-      overflow-y: auto; padding: 40px; display: flex; flex-direction: column; gap: 32px;
+      width: 440px; background: var(--bg); border-right: 1px solid var(--border);
+      overflow-y: auto; padding: 40px; display: flex; flex-direction: column; gap: 0;
     }
-    .form-pane h2 { font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+    .form-step { display: none; animation: fadeIn 0.4s ease; }
+    .form-step.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .form-pane h2 { font-size: 24px; font-weight: 900; color: var(--text-dark); margin-bottom: 8px; letter-spacing: -1px; }
+    .step-description { font-size: 14px; font-weight: 500; color: var(--muted); margin-bottom: 32px; }
     
-    .section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--blue); margin-bottom: 16px; border-bottom: 2px solid var(--blue-light); padding-bottom: 8px; }
+    .section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--blue-light); }
 
     .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
     .input-group label { font-size: 12px; font-weight: 700; color: var(--text-dark); }
@@ -228,6 +236,79 @@
     }
     .btn-download:hover { transform: translateY(-4px); background: var(--blue-dark); }
 
+    /* ===== ONBOARDING ===== */
+    .onboarding-overlay {
+        position: fixed; inset: 0; background: var(--bg); z-index: 2000;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 40px; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .onboarding-overlay.fade-out { opacity: 0; pointer-events: none; transform: scale(1.05); }
+
+    .onboarding-card { 
+        max-width: 800px; width: 100%; text-align: center; 
+        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    .ob-title { font-size: 32px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+    .ob-desc { font-size: 16px; color: var(--muted); margin-bottom: 40px; font-weight: 500; }
+
+    /* Filter Bar */
+    .filter-bar {
+        display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 32px; flex-wrap: wrap;
+    }
+    .filter-select {
+        padding: 10px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-dark); background: #fff; outline: none;
+    }
+    .color-picker { display: flex; align-items: center; gap: 10px; margin-left: 20px; }
+    .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+    .color-dot.active { border-color: var(--blue); transform: scale(1.1); }
+
+    .job-input-wrapper {
+        position: relative; max-width: 600px; margin: 0 auto 40px;
+    }
+    .job-input {
+        width: 100%; padding: 24px 32px; font-size: 20px; font-weight: 700;
+        border: 2px solid var(--border); border-radius: 20px; outline: none;
+        transition: 0.3s; background: var(--bg-gray); color: var(--text-dark);
+    }
+    .job-input:focus { border-color: var(--blue); box-shadow: 0 10px 40px rgba(37,99,235,0.1); background: #fff; }
+
+    .ob-btn {
+        padding: 18px 48px; background: var(--blue); color: #fff; border: none;
+        border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer;
+        transition: 0.2s; box-shadow: 0 10px 30px rgba(37,99,235,0.25);
+    }
+    .ob-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(37,99,235,0.3); }
+
+    .template-recommendations {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 40px; padding-bottom: 100px;
+    }
+    .rec-card {
+        background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 0;
+        cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
+        display: flex; flex-direction: column;
+    }
+    .rec-card:hover { transform: translateY(-8px); box-shadow: 0 30px 60px rgba(0,0,0,0.1); }
+    .rec-card.active { border-color: var(--blue); }
+    
+    .rec-thumb { height: 380px; padding: 20px; background: #fff; flex: 1; }
+    .rec-footer { padding: 20px; border-top: 1px solid var(--border); background: #fff; text-align: center; }
+    .btn-choose { 
+        width: 100%; padding: 12px; background: var(--blue); color: #fff; border: none; border-radius: 100px; 
+        font-weight: 800; font-size: 13px; cursor: pointer; transition: 0.2s;
+    }
+    
+    .choose-later {
+        position: fixed; bottom: 40px; right: 40px; background: #fee2e2; color: #111;
+        padding: 16px 32px; border-radius: 100px; font-weight: 800; font-size: 15px;
+        display: flex; align-items: center; gap: 10px; cursor: pointer; border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.2s; z-index: 2100;
+        text-decoration: none;
+    }
+    .choose-later:hover { transform: translateX(5px); background: #fecaca; }
+    .rec-tag { position: absolute; top: 12px; right: 12px; background: var(--blue); color: #fff; padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+
     @media print {
       aside, .form-pane, .btn-download, .theme-icon-btn { display: none; }
       main { margin-left: 0; }
@@ -238,110 +319,181 @@
 </head>
 <body data-theme="light">
 
-<aside>
-    <a href="dashboard.html" class="sidebar-header">
+<!-- ONBOARDING REMOVED -->
+
+
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="dashboard.html" class="nav-link" style="padding: 10px; margin-right: 10px;">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <a href="dashboard.html" class="nav-brand">
       Hirvo AI
     </a>
-  
-    <nav class="nav-list">
-      <a href="dashboard.html" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">
         Home
       </a>
-      <a href="dashboard.html#recent-simulations" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
-        Interviews
-      </a>
-      <a href="intelligence.html" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-        Intelligence
-      </a>
-      <a href="resume-lab.html" class="nav-item">
+      <a href="resume-lab.html" class="nav-link">
         Resume Lab
       </a>
-      <a href="resume-builder.html" class="nav-item active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+      <a href="resume-builder.html" class="nav-link active">
         Resume Builder
       </a>
-    </nav>
-</aside>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <button id="theme-toggle" class="theme-icon-btn" aria-label="Toggle Theme">
+      <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+      </svg>
+    </button>
+  </div>
+</nav>
 
 <main>
   <div class="builder-container">
     <!-- INPUT AREA -->
-    <div class="form-pane">
-        <h2>Resume Builder</h2>
-        <p style="font-size:13px; margin-top:-4px; margin-bottom:24px;">Build a premium resume with real-time AI insights.</p>
+  <div class="builder-container">
+    <!-- STEPPED SIDEBAR -->
+    <div class="steps-sidebar">
+        <div class="step-icon active" id="step-btn-1" onclick="switchStep(1)" data-label="Personal Info"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="step-icon" id="step-btn-2" onclick="switchStep(2)" data-label="Experience"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
+        <div class="step-icon" id="step-btn-3" onclick="switchStep(3)" data-label="Education"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+        <div class="step-icon" id="step-btn-4" onclick="switchStep(4)" data-label="Expertise"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <div class="step-icon" id="step-btn-5" onclick="switchStep(5)" data-label="Templates"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+        <div style="flex:1;"></div>
+        <div class="step-icon" id="step-btn-ai" onclick="toggleAIPane()" data-label="AI Assistant"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg></div>
+    </div>
 
-        <section>
-            <div class="section-title">Select Template</div>
-            <div class="template-grid" id="template-list">
+    <!-- INPUT AREA -->
+    <div class="form-pane">
+        <!-- STEP 1: PERSONAL INFO -->
+        <div class="form-step active" id="step-1">
+            <h2>Personal Identity</h2>
+            <p class="step-description">Tell the world who you are and how they can reach you.</p>
+
+            <section>
+                <div class="input-group">
+                    <label>Profile Photo</label>
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <div id="photo-preview-box" style="width:60px; height:60px; border-radius:50%; background:#eee; border:2px solid var(--border); overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                            <img id="setup-photo-preview" src="" style="width:100%; height:100%; object-fit:cover; display:none;"/>
+                            <span style="font-size:24px; color:#94a3b8;">+</span>
+                        </div>
+                        <input type="file" id="in-photo" accept="image/*" onchange="handlePhoto(event)" style="display:none;"/>
+                        <button class="btn-add" style="margin:0;" onclick="document.getElementById('in-photo').click()">Upload New Image</button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="in-name" placeholder="MORGAN MAXWELL" oninput="updatePreview()"/>
+                </div>
+                <div class="input-group">
+                    <label>Job Title</label>
+                    <input type="text" id="in-role" placeholder="Marketing Manager" oninput="updatePreview()"/>
+                </div>
+                <div class="grid-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="input-group">
+                        <label>Phone</label>
+                        <input type="text" id="in-phone" placeholder="+123-456-7890" oninput="updatePreview()"/>
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="in-email" placeholder="m@example.com" oninput="updatePreview()"/>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Location</label>
+                    <input type="text" id="in-location" placeholder="San Francisco, CA" oninput="updatePreview()"/>
+                </div>
+
+                <div class="section-title">Professional Summary</div>
+                <div class="input-group">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <label style="margin:0;">Write about yourself</label>
+                        <span style="color:var(--blue); font-size:11px; cursor:pointer; font-weight:800;" onclick="generateAISummary()">✨ AI AUTO-WRITE</span>
+                    </div>
+                    <textarea id="in-about" rows="5" placeholder="Brief professional summary..." oninput="updatePreview()"></textarea>
+                </div>
+            </section>
+            
+            <button class="btn-ai" style="margin-top:20px;" onclick="switchStep(2)">Proceed to Experience &rarr;</button>
+        </div>
+
+        <!-- STEP 2: EXPERIENCE -->
+        <div class="form-step" id="step-2">
+            <h2>Work History</h2>
+            <p class="step-description">Start with your most recent role and highlight your impact.</p>
+            
+            <div id="exp-fields">
+                <div class="exp-entry" style="background:var(--bg-gray); padding:20px; border-radius:16px; margin-bottom:20px; border:1px solid var(--border);">
+                    <div class="input-group"><label>Company</label><input type="text" class="in-exp-comp" placeholder="Company Name" oninput="updatePreview()"/></div>
+                    <div class="grid-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                        <div class="input-group"><label>Years</label><input type="text" class="in-exp-dates" placeholder="2017 - 2020" oninput="updatePreview()"/></div>
+                        <div class="input-group"><label>Job Position</label><input type="text" class="in-exp-role" placeholder="Marketing Lead" oninput="updatePreview()"/></div>
+                    </div>
+                    <div class="input-group">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <label style="margin:0;">Description</label>
+                            <span style="color:var(--blue); font-size:11px; cursor:pointer; font-weight:800;" onclick="suggestExpBullets(this)">✨ AI BULLETS</span>
+                        </div>
+                        <textarea class="in-exp-desc" rows="3" placeholder="Key achievements..." oninput="updatePreview()"></textarea>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-add" style="width:100%; padding:14px; border:2px dashed var(--border);" onclick="addExp()">+ Add Another Role</button>
+            <button class="btn-ai" style="margin-top:40px;" onclick="switchStep(3)">Educational Background &rarr;</button>
+        </div>
+
+        <!-- STEP 3: EDUCATION -->
+        <div class="form-step" id="step-3">
+             <h2>Education</h2>
+             <p class="step-description">Mention your degrees and relevant academic achievements.</p>
+             <div id="edu-fields">
+                <div class="edu-entry" style="background:var(--bg-gray); padding:20px; border-radius:16px; margin-bottom:20px; border:1px solid var(--border);">
+                    <div class="input-group"><label>University</label><input type="text" class="in-edu-univ" placeholder="University Name" oninput="updatePreview()"/></div>
+                    <div class="grid-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                        <div class="input-group"><label>Degree</label><input type="text" class="in-edu-degree" placeholder="Your Degree" oninput="updatePreview()"/></div>
+                        <div class="input-group"><label>Year</label><input type="text" class="in-edu-year" placeholder="2015" oninput="updatePreview()"/></div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-add" style="width:100%; padding:14px; border:2px dashed var(--border);" onclick="addEdu()">+ Add Education</button>
+            <button class="btn-ai" style="margin-top:40px;" onclick="switchStep(4)">Skill & Expertise &rarr;</button>
+        </div>
+
+        <!-- STEP 4: EXPERTISE -->
+        <div class="form-step" id="step-4">
+             <h2>Expertise</h2>
+             <p class="step-description">List your key skills. Use commas to separate them.</p>
+             <div class="input-group">
+                <label>Skills (Comma separated)</label>
+                <textarea id="in-skills" rows="5" placeholder="UI/UX, Python, Leadership, Product Scaling..." oninput="updatePreview()" style="line-height:1.6;"></textarea>
+            </div>
+            <button class="btn-ai" style="margin-top:40px;" onclick="switchStep(5)">Design & Layout &rarr;</button>
+        </div>
+
+        <!-- STEP 5: TEMPLATES -->
+        <div class="form-step" id="step-5">
+            <h2>Design Studio</h2>
+            <p class="step-description">Customize the look and feel of your professional document.</p>
+            
+            <div class="section-title">Choose Template</div>
+            <div class="template-grid" id="template-list" style="grid-template-columns: repeat(2, 1fr); gap:12px;">
                 <!-- Template list will be injected here -->
             </div>
-        </section>
 
-        <section>
-            <div class="section-title">Personal Info</div>
-            <div class="input-group">
-                <label>Profile Photo</label>
-                <input type="file" id="in-photo" accept="image/*" onchange="handlePhoto(event)"/>
+            <div class="section-title">Color Palette</div>
+            <div style="display:flex; gap:12px; margin-bottom:32px;">
+                <div class="color-dot active" style="background:#2563eb;" onclick="setAccent('#2563eb')"></div>
+                <div class="color-dot" style="background:#4f46e5;" onclick="setAccent('#4f46e5')"></div>
+                <div class="color-dot" style="background:#000000;" onclick="setAccent('#000000')"></div>
+                <div class="color-dot" style="background:#dc2626;" onclick="setAccent('#dc2626')"></div>
+                <div class="color-dot" style="background:#16a34a;" onclick="setAccent('#16a34a')"></div>
             </div>
-            <div class="input-group">
-                <label>Full Name</label>
-                <input type="text" id="in-name" placeholder="MORGAN MAXWELL" oninput="updatePreview()"/>
-            </div>
-            <div class="input-group">
-                <label>Job Title</label>
-                <input type="text" id="in-role" placeholder="Marketing Manager" oninput="updatePreview()"/>
-            </div>
-            <div class="input-group">
-                <label>Phone</label>
-                <input type="text" id="in-phone" placeholder="+123-456-7890" oninput="updatePreview()"/>
-            </div>
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" id="in-email" placeholder="hello@reallygreatsite.com" oninput="updatePreview()"/>
-            </div>
-            <div class="input-group">
-                <label>Location</label>
-                <input type="text" id="in-location" placeholder="123 Anywhere St., Any City" oninput="updatePreview()"/>
-            </div>
-        </section>
-
-        <section>
-            <div class="section-title">About Me</div>
-            <div class="input-group">
-                <textarea id="in-about" rows="4" placeholder="Brief professional summary..." oninput="updatePreview()"></textarea>
-            </div>
-        </section>
-
-        <section id="exp-fields">
-            <div class="section-title">Experience</div>
-            <div class="exp-entry">
-                <div class="input-group"><label>Company</label><input type="text" class="in-exp-comp" placeholder="Company Name" oninput="updatePreview()"/></div>
-                <div class="input-group"><label>Years</label><input type="text" class="in-exp-dates" placeholder="2017 - 2020" oninput="updatePreview()"/></div>
-                <div class="input-group"><label>Job Position</label><input type="text" class="in-exp-role" placeholder="Marketing Lead" oninput="updatePreview()"/></div>
-                <div class="input-group"><label>Description</label><textarea class="in-exp-desc" rows="3" placeholder="Key achievements..." oninput="updatePreview()"></textarea></div>
-            </div>
-        </section>
-        <button class="btn-add" onclick="addExp()">+ Add Experience</button>
-
-        <section id="edu-fields">
-            <div class="section-title">Education</div>
-            <div class="edu-entry">
-                <div class="input-group"><label>University</label><input type="text" class="in-edu-univ" placeholder="University Name" oninput="updatePreview()"/></div>
-                <div class="input-group"><label>Degree</label><input type="text" class="in-edu-degree" placeholder="Your Degree" oninput="updatePreview()"/></div>
-                <div class="input-group"><label>Year</label><input type="text" class="in-edu-year" placeholder="2015" oninput="updatePreview()"/></div>
-            </div>
-        </section>
-        <button class="btn-add" onclick="addEdu()">+ Add Education</button>
-
-        <section>
-            <div class="section-title">Expertise</div>
-            <div class="input-group">
-                <input type="text" id="in-skills" placeholder="UI/UX, Python, Logic (Comma separated)" oninput="updatePreview()"/>
-            </div>
-        </section>
+        </div>
     </div>
 
     <!-- PREVIEW AREA -->
@@ -428,7 +580,11 @@
             Generate AI Summary
         </button>
 
-        <button class="btn-ai" style="background:#0f172a;" onclick="analyzeWithAI()">
+        <button class="btn-ai" style="background:#0f172a;" onclick="matchJobDescription()">
+            Match Job Description
+        </button>
+
+        <button class="btn-ai" style="background:#4f46e5; margin-top: 10px;" onclick="analyzeWithAI()">
             Analyze Resume Quality
         </button>
 
@@ -459,7 +615,114 @@
 </main>
 
 <script>
+    // --- STATE ---
+    let currentTemplate = 'modern-dark';
+    let currentStep = 1;
     let currentZoom = 0.75;
+
+
+    
+    // --- STEP NAVIGATION ---
+    function switchStep(n) {
+        document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
+        const targetStep = document.getElementById(`step-${n}`);
+        if(targetStep) targetStep.classList.add('active');
+
+        document.querySelectorAll('.step-icon').forEach(icon => icon.classList.remove('active'));
+        const btn = document.getElementById(`step-btn-${n}`);
+        if(btn) btn.classList.add('active');
+        
+        currentStep = n;
+        document.querySelector('.form-pane').scrollTop = 0;
+    }
+
+    // --- TEMPLATE ENGINE ---
+    const templates = [
+        "modern-dark", "indigo-edge", "emerald-minimal", "executive", "creative",
+        "royal-blue", "sleek-slate", "developer", "clean", "gold"
+    ];
+
+    function initTemplates() {
+        const list = document.getElementById('template-list');
+        if(!list) return;
+        list.innerHTML = templates.map(t => `
+            <div class="template-item ${t === currentTemplate ? 'active' : ''}" onclick="switchTemplate('${t}', this)">
+                <div class="template-thumb" style="background: linear-gradient(135deg, ${getThumbColor(t)}, #f1f5f9);"></div>
+                <div class="template-name">${t.replace('-', ' ')}</div>
+            </div>
+        `).join('');
+    }
+
+    function switchTemplate(name, el) {
+        currentTemplate = name;
+        document.getElementById('resume-output').setAttribute('data-template', name);
+        document.querySelectorAll('.template-item').forEach(i => i.classList.remove('active'));
+        if(el) el.classList.add('active');
+    }
+
+    function getThumbColor(t) {
+        const colors = {
+            'modern-dark': '#333', 'indigo-edge': '#4f46e5', 'emerald-minimal': '#065f46',
+            'executive': '#1e293b', 'creative': '#ea580c', 'royal-blue': '#1d4ed8',
+            'sleek-slate': '#334155', 'developer': '#0f172a', 'clean': '#eee', 'gold': '#422006'
+        };
+        return colors[t] || '#333';
+    }
+
+    function setAccent(color) {
+        const out = document.getElementById('resume-output');
+        out.style.setProperty('--header-bg', color);
+        out.style.setProperty('--accent', color);
+        document.querySelectorAll('.color-dot').forEach(dot => {
+            dot.classList.remove('active');
+            if(dot.style.backgroundColor === color || dot.style.background === color) dot.classList.add('active');
+        });
+    }
+
+    // --- PREVIEW HANDLING ---
+    function updatePreview() {
+        // Simple Fields
+        const fields = ['name' , 'role', 'phone', 'email', 'location', 'about'];
+        fields.forEach(f => {
+            const el = document.getElementById(`in-${f}`);
+            const out = document.getElementById(`out-${f}`);
+            if(el && out) out.textContent = el.value || el.placeholder;
+        });
+
+        // Experience
+        const expHtml = Array.from(document.querySelectorAll('.exp-entry')).map(item => {
+            const comp = item.querySelector('.in-exp-comp').value || 'Company Name';
+            const dates = item.querySelector('.in-exp-dates').value || '2017 - 2020';
+            const role = item.querySelector('.in-exp-role').value || 'Job Position';
+            const desc = item.querySelector('.in-exp-desc').value || 'Key achievements and responsibilities...';
+            return `<div class="exp-item">
+                <div class="exp-header"><span>${comp}</span><span>${dates}</span></div>
+                <div class="exp-sub">${role}</div>
+                <div>${desc}</div>
+            </div>`;
+        }).join('');
+        document.getElementById('out-experience').innerHTML = expHtml;
+
+        // Education
+        const eduHtml = Array.from(document.querySelectorAll('.edu-entry')).map(item => {
+            const univ = item.querySelector('.in-edu-univ').value || 'University Name';
+            const degree = item.querySelector('.in-edu-degree').value || 'Your Degree';
+            const year = item.querySelector('.in-edu-year').value || '2015';
+            return `<div class="edu-item">
+                <div class="exp-header"><span>${univ}</span><span>${year}</span></div>
+                <div class="exp-sub">${degree}</div>
+            </div>`;
+        }).join('');
+        document.getElementById('out-education').innerHTML = eduHtml;
+
+        // Skills
+        const skillsVal = document.getElementById('in-skills').value;
+        const skillsArr = skillsVal.split(',').map(s => s.trim()).filter(s => s);
+        document.getElementById('out-skills').innerHTML = skillsArr.length 
+            ? skillsArr.map(s => `<div class="skill-item"><div class="skill-dot"></div> ${s}</div>`).join('')
+            : '<div class="skill-item">Skill set...</div>';
+    }
+
     function adjustZoom(delta) {
         currentZoom = Math.max(0.3, Math.min(1.5, currentZoom + delta));
         document.getElementById('zoom-wrap').style.transform = `scale(${currentZoom})`;
@@ -474,105 +737,33 @@
                 const img = document.getElementById('out-photo');
                 img.src = event.target.result;
                 img.classList.add('visible');
+                
+                const setupImg = document.getElementById('setup-photo-preview');
+                setupImg.src = event.target.result;
+                setupImg.style.display = 'block';
+                const boxSpan = document.getElementById('photo-preview-box').querySelector('span');
+                if(boxSpan) boxSpan.style.display = 'none';
             };
             reader.readAsDataURL(file);
         }
     }
 
-    const templates = [
-        "modern-dark", "indigo-edge", "emerald-minimal", "executive", "creative",
-        "royal-blue", "sleek-slate", "developer", "clean", "gold"
-    ];
-
-    function initTemplates() {
-        const list = document.getElementById('template-list');
-        list.innerHTML = templates.map(t => `
-            <div class="template-item ${t === 'modern-dark' ? 'active' : ''}" onclick="switchTemplate('${t}', this)">
-                <div class="template-thumb" style="background: linear-gradient(135deg, ${getThumbColor(t)}, #f1f5f9);"></div>
-                <div class="template-name">${t.replace('-', ' ')}</div>
-            </div>
-        `).join('');
-    }
-
-    function switchTemplate(name, el) {
-        document.getElementById('resume-output').setAttribute('data-template', name);
-        document.querySelectorAll('.template-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-    }
-
-    function getThumbColor(t) {
-        const colors = {
-            'modern-dark': '#333', 'indigo-edge': '#4f46e5', 'emerald-minimal': '#065f46',
-            'executive': '#1e293b', 'creative': '#ea580c', 'royal-blue': '#1d4ed8',
-            'sleek-slate': '#334155', 'developer': '#0f172a', 'clean': '#eee', 'gold': '#422006'
-        };
-        return colors[t] || '#333';
-    }
-
-    async function saveResume() {
-        const data = {
-            name: document.getElementById('in-name').value,
-            role: document.getElementById('in-role').value,
-            phone: document.getElementById('in-phone').value,
-            email: document.getElementById('in-email').value,
-            location: document.getElementById('in-location').value,
-            about: document.getElementById('in-about').value,
-            experience: [], 
-            education: [],
-            skills: document.getElementById('in-skills').value.split(','),
-        };
-        
-        try {
-            const res = await fetch('http://localhost:8000/api/resume/create', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                body: JSON.stringify({ template: document.getElementById('resume-output').dataset.template, data })
-            });
-            if(res.ok) alert("Resume saved successfully!");
-        } catch(e) { console.error(e); }
-    }
-
-    async function generateAISummary() {
-        const btn = event.currentTarget;
-        btn.innerHTML = 'Generating...';
-        try {
-            const res = await fetch('http://localhost:8000/api/resume/generate-summary', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ role: document.getElementById('in-role').value, skills: document.getElementById('in-skills').value })
-            });
-            const data = await res.json();
-            document.getElementById('in-about').value = data.summary;
-            updatePreview();
-        } finally { btn.innerHTML = 'Generate AI Summary'; }
-    }
-
-    async function analyzeWithAI() {
-        const pan = document.getElementById('ai-results');
-        pan.style.display = 'block';
-        pan.style.opacity = '0.5';
-        try {
-            const res = await fetch('http://localhost:8000/api/resume/analyze', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-            });
-            const data = await res.json();
-            document.getElementById('ai-score').textContent = data.score;
-            document.getElementById('ai-insight').textContent = data.summary_insight;
-            document.getElementById('ai-strengths').innerHTML = data.strengths.map(s => `<li>${s}</li>`).join('');
-            document.getElementById('ai-weakness').innerHTML = data.weaknesses.map(s => `<li>${s}</li>`).join('');
-        } finally { pan.style.opacity = '1'; }
-    }
-
+    // --- FORM ACTIONS ---
     function addEdu() {
         const container = document.getElementById('edu-fields');
         const div = document.createElement('div');
         div.className = 'edu-entry';
-        div.style.marginTop = '20px';
+        div.style.background = 'var(--bg-gray)';
+        div.style.padding = '20px';
+        div.style.borderRadius = '16px';
+        div.style.marginBottom = '20px';
+        div.style.border = '1px solid var(--border)';
         div.innerHTML = `
             <div class="input-group"><label>University</label><input type="text" class="in-edu-univ" placeholder="University Name" oninput="updatePreview()"/></div>
-            <div class="input-group"><label>Degree</label><input type="text" class="in-edu-degree" placeholder="Your Degree" oninput="updatePreview()"/></div>
-            <div class="input-group"><label>Year</label><input type="text" class="in-edu-year" placeholder="2018" oninput="updatePreview()"/></div>
+            <div class="grid-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="input-group"><label>Degree</label><input type="text" class="in-edu-degree" placeholder="Your Degree" oninput="updatePreview()"/></div>
+                <div class="input-group"><label>Year</label><input type="text" class="in-edu-year" placeholder="2018" oninput="updatePreview()"/></div>
+            </div>
         `;
         container.appendChild(div);
     }
@@ -581,73 +772,120 @@
         const container = document.getElementById('exp-fields');
         const div = document.createElement('div');
         div.className = 'exp-entry';
-        div.style.marginTop = '20px';
+        div.style.background = 'var(--bg-gray)';
+        div.style.padding = '20px';
+        div.style.borderRadius = '16px';
+        div.style.marginBottom = '20px';
+        div.style.border = '1px solid var(--border)';
         div.innerHTML = `
             <div class="input-group"><label>Company</label><input type="text" class="in-exp-comp" placeholder="Company Name" oninput="updatePreview()"/></div>
-            <div class="input-group"><label>Years</label><input type="text" class="in-exp-dates" placeholder="2017 - 2020" oninput="updatePreview()"/></div>
-            <div class="input-group"><label>Job Position</label><input type="text" class="in-exp-role" placeholder="Marketing Lead" oninput="updatePreview()"/></div>
-            <div class="input-group"><label>Description</label><textarea class="in-exp-desc" rows="3" placeholder="Key achievements..." oninput="updatePreview()"></textarea></div>
+            <div class="grid-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="input-group"><label>Years</label><input type="text" class="in-exp-dates" placeholder="2017 - 2020" oninput="updatePreview()"/></div>
+                <div class="input-group"><label>Job Position</label><input type="text" class="in-exp-role" placeholder="Senior Role" oninput="updatePreview()"/></div>
+            </div>
+            <div class="input-group">
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <label style="margin:0;">Description</label>
+                    <span style="color:var(--blue); font-size:11px; cursor:pointer; font-weight:800;" onclick="suggestExpBullets(this)">✨ AI BULLETS</span>
+                </div>
+                <textarea class="in-exp-desc" rows="3" placeholder="Key achievements..." oninput="updatePreview()"></textarea>
+            </div>
         `;
         container.appendChild(div);
     }
 
-    function updatePreview() {
-        document.getElementById('out-name').textContent = document.getElementById('in-name').value || 'MORGAN MAXWELL';
-        document.getElementById('out-role').textContent = document.getElementById('in-role').value || 'Marketing Manager';
-        document.getElementById('out-phone').textContent = document.getElementById('in-phone').value || '+123-456-7890';
-        document.getElementById('out-email').textContent = document.getElementById('in-email').value || 'hello@reallygreatsite.com';
-        document.getElementById('out-location').textContent = document.getElementById('in-location').value || '123 Anywhere St., Any City';
-        document.getElementById('out-about').textContent = document.getElementById('in-about').value || 'Brief professional summary...';
-
-        const expItems = document.querySelectorAll('.exp-entry');
-        let expHtml = '';
-        expItems.forEach(item => {
-            const comp = item.querySelector('.in-exp-comp').value || 'Company Name';
-            const dates = item.querySelector('.in-exp-dates').value || '2017 - 2020';
-            const role = item.querySelector('.in-exp-role').value || 'Job Position';
-            const desc = item.querySelector('.in-exp-desc').value || 'Key achievements and responsibilities...';
-            expHtml += `
-                <div class="exp-item">
-                    <div class="exp-header"><span>${comp}</span><span>${dates}</span></div>
-                    <div class="exp-sub">${role}</div>
-                    <div>${desc}</div>
-                </div>
-            `;
-        });
-        document.getElementById('out-experience').innerHTML = expHtml;
-
-        const eduItems = document.querySelectorAll('.edu-entry');
-        let eduHtml = '';
-        eduItems.forEach(item => {
-            const univ = item.querySelector('.in-edu-univ').value || 'University Name';
-            const degree = item.querySelector('.in-edu-degree').value || 'Your Degree';
-            const year = item.querySelector('.in-edu-year').value || '2015';
-            eduHtml += `
-                <div class="edu-item">
-                    <div class="exp-header"><span>${univ}</span><span>${year}</span></div>
-                    <div class="exp-sub">${degree}</div>
-                </div>
-            `;
-        });
-        document.getElementById('out-education').innerHTML = eduHtml;
-
-        const skillsVal = document.getElementById('in-skills').value;
-        const skillsArr = skillsVal.split(',').map(s => s.trim()).filter(s => s !== '');
-        if (skillsArr.length > 0) {
-            document.getElementById('out-skills').innerHTML = skillsArr.map(s => `<div class="skill-item"><div class="skill-dot"></div> ${s}</div>`).join('');
-        }
+    // --- AI INTEGRATIONS ---
+    async function generateAISummary() {
+        const role = document.getElementById('in-role').value;
+        const skills = document.getElementById('in-skills').value;
+        if(!role) return alert("Please enter your target role first.");
+        
+        const btn = event?.currentTarget || event?.target;
+        const oldTxt = btn?.innerHTML || '✨ AI AUTO-WRITE';
+        if(btn) btn.innerHTML = '✨ THOUGHT...';
+        
+        try {
+            const res = await fetch('http://localhost:8000/api/resume/generate-summary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role, skills })
+            });
+            const data = await res.json();
+            document.getElementById('in-about').value = data.summary;
+            updatePreview();
+        } catch(e) { alert("AI Service temporarily unavailable."); }
+        finally { if(btn) btn.innerHTML = oldTxt; }
     }
 
-    function updateThemeUI(theme) {
-        // Shared theme handling
+    async function suggestExpBullets(btn) {
+        const entry = btn.closest('.exp-entry');
+        const role = entry.querySelector('.in-exp-role').value;
+        const comp = entry.querySelector('.in-exp-comp').value;
+        const targetDesc = entry.querySelector('.in-exp-desc');
+        
+        if(!role) return alert("Please specify the Job Position first.");
+        
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '✨ THOUGHT...';
+        
+        try {
+            const res = await fetch('http://localhost:8000/api/resume/suggest-bullets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role, company: comp })
+            });
+            const data = await res.json();
+            targetDesc.value = data.bullets;
+            updatePreview();
+        } catch(e) { alert("AI Service temporarily unavailable."); }
+        finally { btn.innerHTML = originalText; }
     }
 
+    async function saveResume() {
+        const data = getResumeData();
+        try {
+            const res = await fetch('http://localhost:8000/api/resume/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                body: JSON.stringify({ template: currentTemplate, data })
+            });
+            if(res.ok) alert("Resume saved to your profile!");
+        } catch(e) { console.error(e); }
+    }
+
+    function getResumeData() {
+        return {
+            name: document.getElementById('in-name').value,
+            role: document.getElementById('in-role').value,
+            phone: document.getElementById('in-phone').value,
+            email: document.getElementById('in-email').value,
+            location: document.getElementById('in-location').value,
+            about: document.getElementById('in-about').value,
+            experience: Array.from(document.querySelectorAll('.exp-entry')).map(item => ({
+                company: item.querySelector('.in-exp-comp').value,
+                dates: item.querySelector('.in-exp-dates').value,
+                role: item.querySelector('.in-exp-role').value,
+                desc: item.querySelector('.in-exp-desc').value
+            })),
+            education: Array.from(document.querySelectorAll('.edu-entry')).map(item => ({
+                university: item.querySelector('.in-edu-univ').value,
+                degree: item.querySelector('.in-edu-degree').value,
+                year: item.querySelector('.in-edu-year').value
+            })),
+            skills: document.getElementById('in-skills').value.split(',').map(s => s.trim()).filter(s => s)
+        };
+    }
+
+    // --- BUILDER INITIALIZATION ---
+
+    // Initialize
     window.addEventListener('load', () => {
         initTemplates();
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         updatePreview();
     });
+</script>
 </script>
 
 </body>

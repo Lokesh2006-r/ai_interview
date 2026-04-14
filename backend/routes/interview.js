@@ -4,7 +4,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const Interview = require('../models/Interview');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY.trim());
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 router.post('/', async (req, res) => {
     const { role, company, userId } = req.body;
@@ -38,29 +38,59 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/ask', async (req, res) => {
-    const { role, company, context, history, interviewId, candidateName, currentCode } = req.body;
+    const { role, company, context, history, interviewId, candidateName, level, stage, memory_summary, currentCode } = req.body;
 
     try {
-        // System Prompt inspired by IntelliView - Professional Coach & Interviewer
-        let prompt = `Act as an AI Interview Coach named IntelliView, a senior technical lead from ${company} hiring for a ${role} role. `;
-        prompt += `The candidate's name is ${candidateName || 'Candidate'}. `;
-        
-        // Persona Strategy
-        prompt += `INSTRUCTIONS:
-        1. Evaluate the candidate's last input briefly (be encouraging).
-        2. Ask a high-stakes, specific interview question for ${role}.
-        3. If relevant, reference the current code provided: ${currentCode || "No code provided yet"}.
-        4. Keep your response CONCISE (max 4 lines). No meta-commentary.
-        5. Focus on deep architecture, technical Trade-offs, or soft-skills.
-        6. Tone: Professional, authoritative, yet coaching-oriented.`;
+        const systemPrompt = `You are a professional AI Interviewer who speaks in a highly realistic, human-like voice similar to ElevenLabs text-to-speech. 
+Your responses will be converted into speech, so you MUST sound natural, smooth, and conversational. 
 
-        prompt += `\n\nCONTEXT: ${context}\nINTERVIEW HISTORY: ${JSON.stringify(history)}`;
+Speaking Style:
+- Use clear pronunciation and natural pacing.
+- Use SHORT sentences.
+- Use commas and periods strategically to create natural pauses and a lifelike speaking rhythm.
+- Maintain a confident, calm, and slightly formal tone.
+- Occasionally use natural fillers like "Alright," "Okay," "I see," or "Good" to sound human.
+- Keep responses CONCISE (max 2-3 short sentences).
 
-        const result = await model.generateContent(prompt);
+Interview Flow:
+1. Start by asking the candidate’s name, role, and experience level.
+2. Proceed through stages: Warm-up, Technical, Problem-solving, and HR.
+3. Ask ONE question at a time. Wait for a response.
+4. After each answer, respond briefly with a natural reaction ("I see," "Interesting point"), then ask a follow-up or the next question.
+
+Rules:
+- Adapt difficulty: increase challenge if answers are strong, simplify if weak.
+- Test depth with "why" or "how".
+- NEVER break character.
+- Avoid robotic or overly complex wording.
+- Keep the flow smooth for voice output.
+- Ton: Senior Lead from ${company || 'Top Tech Company'}`;
+
+        const dynamicUserPrompt = `Candidate Response: "${context}"
+Candidate Code: 
+\`\`\`
+${currentCode || 'No code provided yet'}
+\`\`\`
+Interview Context:
+- Role: ${role}
+- Experience: ${level || 'Intermediate'}
+- Current Stage: ${stage || 'Warm-up'}
+- Previous Answers Summary: ${memory_summary || 'Starting session'}
+
+Instructions:
+- Analyze the response
+- Ask next best question
+- Adjust difficulty dynamically
+- Keep interview flow natural`;
+
+        const result = await model.generateContent([
+            { text: systemPrompt },
+            { text: dynamicUserPrompt }
+        ]);
         const response = await result.response;
         const text = response.text();
 
-        // Save both user context and AI response to MongoDB
+        // Save transcript
         if (interviewId) {
              await Interview.findByIdAndUpdate(interviewId, { 
                  $push: { 
@@ -97,15 +127,17 @@ router.patch('/:id/complete', async (req, res) => {
              });
         }
 
-        // Evaluation Prompt inspired by IntelliView's structured metric report
-        const analysisPrompt = `Analyze the full record of this ${interview.role} interview at ${interview.company}.
-        Provide a professional performance report in JSON format only with these keys:
-        - rating: (e.g. 'Strong Hire', 'Strong Reject')
-        - overallScore: (integer 0-100)
-        - metrics: { technical: score, communication: score, problem_solving: score, clarity: score, fillerCount: integer } (all integers 0-10, except fillerCount)
-        - summaries: [3-4 high-impact bullet points]
-        - strengths: [List of 2-3 specific wins]
-        - improvement: [List of 2-3 constructive focus areas]
+        const analysisPrompt = `Generate a final interview report for the ${interview.role} interview at ${interview.company}.
+        Analyze all answers and tracked scores. 
+        
+        Provide a JSON response with these keys:
+        - rating: (Hiring Decision: 'Yes', 'No', 'Maybe')
+        - overallScore: (Score out of 10)
+        - metrics: { technical: score/10, communication: score/10, problem_solving: score/10, confidence: score/10 }
+        - summaries: [Detailed performance summary]
+        - strengths: [List of strengths]
+        - weaknesses: [List of weaknesses]
+        - improvement: [Suggested topics to improve]
         
         Full Transcript: ${JSON.stringify(interview.transcript)}`;
 
