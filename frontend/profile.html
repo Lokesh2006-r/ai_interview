@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Profile — Hirvo AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #0f172a;
+      --blue-light: #eff6ff;
+      --bg: #ffffff;
+      --bg-gray: #f8fafc;
+      --bg-card: #ffffff;
+      --text: #4b5563;
+      --text-dark: #0f172a;
+      --muted: #94a3b8;
+      --border: #f1f5f9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --radius-lg: 28px;
+      --radius-md: 16px;
+    }
+
+    [data-theme="dark"] {
+      --bg: #09090b;
+      --bg-gray: #020617;
+      --bg-card: #111827;
+      --text: #94a3b8;
+      --text-dark: #f8fafc;
+      --muted: #64748b;
+      --border: #1e293b;
+      --blue-light: rgba(37, 99, 235, 0.15);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gray);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ===== TOP NAVIGATION ===== */
+    .top-nav {
+      height: 72px;
+      padding: 0 5%;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    [data-theme="dark"] .top-nav { background: rgba(9, 9, 11, 0.8); }
+
+    .nav-left { display: flex; align-items: center; gap: 40px; }
+    .nav-brand {
+      font-weight: 900; font-size: 20px; color: var(--text-dark);
+      text-decoration: none; letter-spacing: -1px;
+    }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-link {
+      padding: 8px 16px; border-radius: var(--radius-md);
+      text-decoration: none; font-size: 14px; font-weight: 600;
+      color: var(--text); transition: all 0.2s;
+    }
+    .nav-link:hover { background: var(--bg-gray); color: var(--text-dark); }
+    .nav-link.active { background: var(--blue-light); color: var(--blue); }
+
+    main {
+      max-width: 1200px; width: 100%; margin: 60px auto;
+      padding: 0 5%; display: grid; grid-template-columns: 320px 1fr; gap: 40px;
+    }
+
+    /* ===== SIDEBAR PROFILE ===== */
+    .profile-sidebar {
+      display: flex; flex-direction: column; gap: 24px;
+    }
+    .profile-card {
+      background: var(--bg-card); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 32px;
+      text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+    }
+    .profile-avatar {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 4px solid var(--bg-gray); margin: 0 auto 20px;
+    }
+    .profile-card h2 { font-size: 20px; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+    .profile-card p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+    
+    .profile-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px;
+    }
+    .p-stat {
+      background: var(--bg-gray); padding: 12px; border-radius: 12px;
+      text-align: center;
+    }
+    .p-stat-val { display: block; font-weight: 800; color: var(--text-dark); font-size: 16px; }
+    .p-stat-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+
+    /* ===== MAIN CONTENT ===== */
+    .profile-content {
+      display: flex; flex-direction: column; gap: 40px;
+    }
+
+    .section-title {
+      font-size: 18px; font-weight: 800; color: var(--text-dark);
+      margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .resume-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .resume-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+    
+    .res-info { display: flex; align-items: center; gap: 16px; }
+    .res-icon {
+      width: 48px; height: 48px; background: var(--blue-light);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      color: var(--blue);
+    }
+    .res-details h4 { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+    .res-details p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .badges-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px;
+    }
+    .badge-card {
+      padding: 20px; border-radius: 20px; border: 1.5px solid var(--border);
+      text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;
+      background: var(--bg-card); transition: 0.2s;
+    }
+    .badge-card:hover { border-color: var(--success); }
+    .badge-icon { font-size: 24px; }
+    .badge-name { font-size: 12px; font-weight: 700; color: var(--text-dark); }
+
+    .btn-edit {
+      padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--bg-card); color: var(--text-dark); font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: 0.2s;
+    }
+    .btn-edit:hover { background: var(--bg-gray); border-color: var(--muted); }
+
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="dashboard.html" class="nav-brand">Hirvo AI</a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">Home</a>
+      <a href="resume-lab.html" class="nav-link">Resume Lab</a>
+      <a href="resume-builder.html" class="nav-link">Resume Builder</a>
+      <a href="profile.html" class="nav-link active">Profile</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <aside class="profile-sidebar">
+    <div class="profile-card">
+      <img id="u-avatar" src="https://ui-avatars.com/api/?name=User&background=eff6ff&color=2563eb&bold=true" class="profile-avatar" alt="Avatar">
+      <h2 id="u-name">User Name</h2>
+      <p id="u-email">user@example.com</p>
+      
+      <div class="profile-stats">
+        <div class="p-stat">
+          <span class="p-stat-val" id="stat-interviews">0</span>
+          <span class="p-stat-label">Interviews</span>
+        </div>
+        <div class="p-stat">
+          <span class="p-stat-val" id="stat-score">0%</span>
+          <span class="p-stat-label">Avg Score</span>
+        </div>
+      </div>
+      
+      <button class="btn-edit" style="width:100%; margin-top:24px;">Edit Profile</button>
+    </div>
+
+    <div class="profile-card" style="text-align:left; padding: 24px;">
+        <h3 style="font-size:14px; margin-bottom:12px;">Settings</h3>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <a href="#" class="nav-link" style="padding:4px 0;">Billing & Plans</a>
+            <a href="#" class="nav-link" style="padding:4px 0;">Notification Prefs</a>
+            <a href="#" class="nav-link" style="padding:4px 0; color:var(--error);" onclick="localStorage.clear(); location.href='login.html'">Log Out</a>
+        </div>
+    </div>
+  </aside>
+
+  <div class="profile-content">
+    <section>
+      <div class="section-title">
+        <h3>Resume Library</h3>
+        <button class="btn-edit" onclick="location.href='resume-builder.html'">Create New +</button>
+      </div>
+      <div id="resume-list" style="display:flex; flex-direction:column; gap:12px;">
+         <!-- Dynamic Resumes -->
+         <div class="resume-card">
+            <div class="res-info">
+                <div class="res-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div class="res-details">
+                    <h4>Primary_Resume_2024.pdf</h4>
+                    <p>Analyzed in Resume Lab • 92% ATS Score</p>
+                </div>
+            </div>
+            <button class="btn-edit">View Analysis</button>
+         </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h3>Achievement Badges</h3>
+      </div>
+      <div class="badges-grid">
+        <div class="badge-card">
+           <span class="badge-icon">🚀</span>
+           <span class="badge-name">Early Adopter</span>
+        </div>
+        <div class="badge-card" style="opacity: 0.5;">
+           <span class="badge-icon">🎯</span>
+           <span class="badge-name">Interview Pro</span>
+        </div>
+        <div class="badge-card" style="opacity: 0.5;">
+           <span class="badge-icon">✍️</span>
+           <span class="badge-name">Resume Master</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+        <div class="section-title">
+          <h3>Security</h3>
+        </div>
+        <div class="profile-card" style="text-align:left;">
+            <p style="font-size:13px; margin-bottom:16px;">Last password change: 3 months ago</p>
+            <button class="btn-edit">Change Password</button>
+        </div>
+    </section>
+  </div>
+</main>
+
+<script>
+  window.addEventListener('load', () => {
+    // Apply Theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    const name = localStorage.getItem('user_name') || 'Guest Candidate';
+    const email = localStorage.getItem('user_email') || 'candidate@example.com';
+    
+    document.getElementById('u-name').textContent = name;
+    document.getElementById('u-email').textContent = email;
+    document.getElementById('u-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=eff6ff&color=2563eb&bold=true`;
+
+    fetchStats();
+    fetchResumes();
+  });
+
+  async function fetchStats() {
+    const userId = localStorage.getItem('user_email') || 'demo_user';
+    try {
+        const response = await fetch('http://localhost:8000/api/interview/all', {
+            headers: { 'user-id': userId }
+        });
+        const data = await response.json();
+        const completed = data.filter(i => i.status === 'completed');
+        
+        document.getElementById('stat-interviews').textContent = completed.length;
+        
+        if (completed.length > 0) {
+            const avg = completed.reduce((acc, curr) => acc + curr.overallScore, 0) / completed.length;
+            document.getElementById('stat-score').textContent = `${Math.round(avg)}%`;
+        }
+    } catch(e) {}
+  }
+
+  async function fetchResumes() {
+    // Placeholder - replace with actual resume API if available
+    const userId = localStorage.getItem('user_email') || 'demo_user';
+    try {
+        const response = await fetch(`http://localhost:8000/api/resume/all?userId=${userId}`);
+        const data = await response.json();
+        const list = document.getElementById('resume-list');
+        
+        if (data.length > 0) {
+            list.innerHTML = data.map(res => `
+                <div class="resume-card">
+                    <div class="res-info">
+                        <div class="res-icon">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <div class="res-details">
+                            <h4>${res.filename || 'Generated Resume'}</h4>
+                            <p>Target: ${res.targetJob || 'Software Role'} • Built with AI</p>
+                        </div>
+                    </div>
+                    <button class="btn-edit">View Details</button>
+                </div>
+            `).join('');
+        }
+    } catch(e) {}
+  }
+</script>
+
+</body>
+</html>
