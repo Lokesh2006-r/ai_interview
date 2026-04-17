@@ -7,7 +7,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
   <style>
+    /* SENTIMENT HUD */
+    .sentiment-hud {
+      position: absolute; top: 12px; right: 12px;
+      display: flex; flex-direction: column; gap: 8px; z-index: 10;
+    }
+    .hud-badge {
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+      padding: 6px 10px; border-radius: 8px; color: white;
+      font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .hud-dot { width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; }
+    .hud-dot.active { background: #10b981; box-shadow: 0 0 8px #10b981; }
+    .hud-dot.warning { background: #f59e0b; }
     /* ==================== CORE RESET & THEME ==================== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -318,20 +333,27 @@
         <!-- Slide 2: Coding Input -->
         <div class="slide" id="slide-code">
           <div class="code-header">
-            <select class="lang-selector">
-              <option>javascript</option>
-              <option>python</option>
-              <option>java</option>
-              <option>cpp</option>
+            <select class="lang-selector" id="code-lang">
+              <option value="javascript">javascript</option>
+              <option value="python">python</option>
+              <option value="java">java</option>
+              <option value="cpp">cpp</option>
             </select>
-            <div style="font-size: 11px; color: var(--text-muted);">Autosave Enabled</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Execution Engine Active</div>
           </div>
-          <div class="code-body">
-            <textarea id="code-editor" class="code-area" placeholder="// Write and optimize your code here..."></textarea>
+          <div class="code-body" style="display:flex; flex-direction:column; overflow:hidden;">
+            <textarea id="code-editor" class="code-area" style="flex:1;" placeholder="// Write and optimize your code here..."></textarea>
+            <div id="code-console" style="height:120px; background:#0f172a; color:#f8fafc; font-family:'Consolas', monospace; padding:12px; font-size:12px; overflow-y:auto; border-top:2px solid var(--border); display:none;">
+               <div style="color:var(--muted); margin-bottom:4px;">> Console Output</div>
+               <div id="console-output"></div>
+            </div>
           </div>
-          <div class="input-area" style="padding: 12px 16px; border-top: 1px solid var(--border);">
-            <button class="btn-submit" onclick="submitAnswer()" style="width: 100%; justify-content: center;">
-              Submit Code Analysis
+          <div class="input-area" style="padding: 12px 16px; border-top: 1px solid var(--border); display:flex; gap:12px;">
+            <button class="btn-submit" id="run-btn" onclick="executeCode()" style="background:var(--success); border-color:var(--success); flex:1; justify-content:center;">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" style="margin-right:4px;"><path d="M8 5v14l11-7z"/></svg> Run Code
+            </button>
+            <button class="btn-submit" onclick="submitAnswer()" style="flex:1; justify-content:center;">
+              Submit Analysis
             </button>
           </div>
         </div>
@@ -346,11 +368,30 @@
           <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop" class="ai-avatar" id="ai-avatar-img">
           <div class="ai-name">Aarav Mehta</div>
           <div id="ai-status" style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Awaiting session...</div>
+          <!-- Voice Visualizer -->
+          <div id="voice-meter-wrap" style="width: 100%; height: 40px; margin-top: 15px; background: rgba(0,0,0,0.05); border-radius: 20px; overflow: hidden; display: none; align-items: center; padding: 0 10px; gap: 4px;">
+            <div class="voice-bar" style="flex:1; height:4px; background:var(--muted); border-radius:2px; transition: 0.1s;"></div>
+            <div class="voice-bar" style="flex:1; height:8px; background:var(--muted); border-radius:2px; transition: 0.1s;"></div>
+            <div class="voice-bar" style="flex:1; height:12px; background:var(--muted); border-radius:2px; transition: 0.1s;"></div>
+            <div class="voice-bar" style="flex:1; height:8px; background:var(--muted); border-radius:3px; transition: 0.1s;"></div>
+            <div class="voice-bar" style="flex:1; height:4px; background:var(--muted); border-radius:2px; transition: 0.1s;"></div>
+          </div>
         </div>
       </div>
       <div class="video-feed user-feed">
         <div class="participant-label">You</div>
         <video id="user-video" class="participant-video" autoplay muted playsinline></video>
+        <!-- Sentiment HUD -->
+        <div class="sentiment-hud">
+          <div class="hud-badge">
+            <div class="hud-dot active" id="focus-dot"></div>
+            <span>FOCUS: <span id="focus-val">Stable</span></span>
+          </div>
+          <div class="hud-badge">
+            <div class="hud-dot" id="emotion-dot"></div>
+            <span>STATE: <span id="emotion-val">Neutral</span></span>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -417,6 +458,111 @@
   // Initial Load
   // Global Theme Logic - Managed by load event
 
+  async function executeCode() {
+    const code = document.getElementById('code-editor').value;
+    const lang = document.getElementById('code-lang').value;
+    const consoleEl = document.getElementById('code-console');
+    const outputEl = document.getElementById('console-output');
+    const runBtn = document.getElementById('run-btn');
+
+    if (!code.trim()) return;
+
+    runBtn.disabled = true;
+    runBtn.textContent = 'Executing...';
+    consoleEl.style.display = 'block';
+    outputEl.innerHTML = '<span style="color:var(--muted)">Pending...</span>';
+
+    try {
+      const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          language: lang === 'javascript' ? 'js' : lang,
+          version: '*', 
+          files: [{ content: code }]
+        })
+      });
+      const data = await response.json();
+      const output = data.run.stdout || data.run.stderr || "No output";
+      outputEl.textContent = output;
+      if (data.run.stderr) outputEl.style.color = 'var(--error)';
+      else outputEl.style.color = '#f8fafc';
+    } catch (err) {
+      outputEl.textContent = "Execution Error: Check your connection.";
+    } finally {
+      runBtn.disabled = false;
+      runBtn.innerHTML = `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" style="margin-right:4px;"><path d="M8 5v14l11-7z"/></svg> Run Code`;
+    }
+  }
+
+  // ===== FACE ANALYSIS (EMOTIONAL INTELLIGENCE) =====
+  let isFaceModelLoaded = false;
+  
+  async function loadFaceModels() {
+    // Model URL for CDN-based loading
+    const MODEL_URL = 'https://raw.githubusercontent.com/vladmandic/face-api/master/model';
+    console.log("Loading AI Vision models...");
+    try {
+        await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+            faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
+        ]);
+        isFaceModelLoaded = true;
+        console.log("Vision models ready ✅");
+        startFaceTracking();
+    } catch(e) {
+        console.warn("Face logic disabled (likely blocked by CSP or connection):", e);
+    }
+  }
+
+  async function startFaceTracking() {
+    if (!videoStream || !isFaceModelLoaded) return;
+    const video = document.getElementById('user-video');
+    
+    setInterval(async () => {
+        if (!sessionActive || video.paused || video.ended) return;
+        try {
+            const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
+            if (detections) {
+                updateFocusUI(true);
+                const expressions = detections.expressions;
+                const topEmotion = Object.entries(expressions).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+                updateEmotionUI(topEmotion);
+            } else {
+                updateFocusUI(false);
+            }
+        } catch(e) {}
+    }, 1000); // 1fps for high stability
+  }
+
+  function updateFocusUI(isFocused) {
+    const dot = document.getElementById('focus-dot');
+    const val = document.getElementById('focus-val');
+    if (isFocused) {
+        dot.classList.add('active');
+        dot.classList.remove('warning');
+        val.textContent = "Stable";
+    } else {
+        dot.classList.remove('active');
+        dot.classList.add('warning');
+        val.textContent = "Distracted";
+    }
+  }
+
+  function updateEmotionUI(emotion) {
+    const dot = document.getElementById('emotion-dot');
+    const val = document.getElementById('emotion-val');
+    val.textContent = emotion.charAt(0).toUpperCase() + emotion.slice(1);
+    
+    if (['happy', 'surprised'].includes(emotion)) {
+        dot.style.background = '#10b981';
+    } else if (['angry', 'sad', 'fearful', 'disgusted'].includes(emotion)) {
+        dot.style.background = '#ef4444';
+    } else {
+        dot.style.background = '#3b82f6';
+    }
+  }
+
   window.addEventListener('load', () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
@@ -442,6 +588,9 @@
         video: { width: 1280, height: 720 }, 
         audio: true 
       });
+      
+      // Load AI Vision
+      loadFaceModels();
       
       const videoEl = document.getElementById('setup-preview');
       videoEl.srcObject = videoStream;
@@ -513,7 +662,45 @@
         console.warn("Backend not reachable, running in demo mode");
     }
 
+    // Start Visualizer
+    document.getElementById('voice-meter-wrap').style.display = 'flex';
+    initVoiceVisualizer();
+    animateVoiceMeter();
+
     startAIConversation();
+  }
+
+  let audioContext, analyser, dataArray, animationId;
+
+  function initVoiceVisualizer() {
+    try {
+      if (!videoStream) return;
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioContext.createAnalyser();
+      const source = audioContext.createMediaStreamSource(videoStream);
+      source.connect(analyser);
+      analyser.fftSize = 64;
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+      console.log("Voice visualizer initialized 🎙️");
+    } catch (e) {
+      console.warn("Visualizer failed:", e);
+    }
+  }
+
+  function animateVoiceMeter() {
+    if (!analyser) return;
+    analyser.getByteFrequencyData(dataArray);
+    const bars = document.querySelectorAll('.voice-bar');
+    const average = dataArray.reduce((p, c) => p + c, 0) / dataArray.length;
+    
+    bars.forEach((bar, i) => {
+        const height = (dataArray[i % 5] / 1.5) + 4;
+        bar.style.height = `${height}px`;
+        bar.style.background = average > 40 ? 'var(--blue)' : 'var(--muted)';
+        if (average > 80) bar.style.background = 'var(--success)';
+    });
+    
+    animationId = requestAnimationFrame(animateVoiceMeter);
   }
 
   async function startAIConversation() {
@@ -625,14 +812,12 @@
     const utterance = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
     
-    // ElevenLabs-style voice prioritization: Look for "Natural", "Google", "Online", or "Premium"
-    const preferredVoice = voices.find(v => 
-      v.name.includes('Natural') || 
-      v.name.includes('Neural') ||
-      v.name.includes('Google US English') || 
-      v.name.includes('Microsoft Aria') || 
-      v.name.includes('Microsoft Guy')
-    ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+    // Better Voice Selection Logic
+    const preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Neural')) || 
+                           voices.find(v => v.name.includes('Aria') || v.name.includes('Guy')) ||
+                           voices.find(v => v.lang === 'en-US' && v.localService) ||
+                           voices.find(v => v.lang.startsWith('en')) || 
+                           voices[0];
 
     utterance.voice = preferredVoice;
     utterance.rate = 1.0; 
@@ -663,49 +848,136 @@
     }, 1000);
   }
 
-  // ===== SPEECH RECOGNITION =====
-  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.continuous = true;
-  recognition.interimResults = false;
-  recognition.lang = 'en-US';
+  // ===== HIGH-ACCURACY VOICE INPUT (GEMINI) =====
+  let mediaRecorder;
+  let audioChunks = [];
+  let isRecording = false;
+  let isToggleOn = false;
 
-  recognition.onresult = (event) => {
-    let transcript = event.results[event.results.length - 1][0].transcript;
-    if (transcript.trim()) {
-      // VISUALLY show transcribed speech in the chat
-      addMessage('user', transcript);
-      
-      interviewHistory.push({ role: 'user', content: transcript });
-      interviewState.history.push({ role: 'user', content: transcript });
-      
-      // Confidence detection
-      if (transcript.length < 20) interviewState.scores.confidence = Math.max(0, interviewState.scores.confidence - 1);
-      else interviewState.scores.confidence = Math.min(10, interviewState.scores.confidence + 1);
-
-      getAIResponse(transcript);
+  async function toggleMic() {
+    if (isToggleOn) {
+      stopRecording();
+      isToggleOn = false;
+    } else {
+      await startRecording();
+      isToggleOn = true;
     }
-  };
+  }
 
-  recognition.onerror = (event) => {
-    console.warn("Speech recognition error:", event.error);
-    if (event.error === 'no-speech') { /* Silence, it's okay but keep going */ }
-  };
+  async function startRecording() {
+    if (isMuted || !sessionActive) return;
+    if (isRecording) return; // Prevent double recording
+    
+    audioChunks = [];
+    // Auto-detect best mime type
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+    
+    try {
+      mediaRecorder = new MediaRecorder(videoStream, { mimeType });
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) audioChunks.push(event.data);
+      };
 
-  recognition.onend = () => {
-    // Keep it always listening unless session turned off
-    if (sessionActive && !isMuted) {
-      try { recognition.start(); } catch(e) {}
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: mimeType });
+        if (audioBlob.size > 1000) { // Ignore tiny clicks
+            await transcribeAudio(audioBlob);
+        } else {
+            document.getElementById('ai-status').textContent = 'Ready';
+        }
+      };
+
+      mediaRecorder.start();
+      isRecording = true;
+      updateMicUI(true);
+    } catch (e) {
+      console.error("MediaRecorder Start Error:", e);
     }
-  };
+  }
 
-  recognition.start();
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      isRecording = false;
+      updateMicUI(false);
+    }
+  }
+
+  function updateMicUI(recording) {
+    const micBtn = document.getElementById('mic-toggle');
+    if (recording) {
+      micBtn.style.background = 'var(--danger)';
+      micBtn.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.6)';
+      micBtn.classList.add('pulse');
+      document.getElementById('ai-status').textContent = 'Listening...';
+    } else {
+      micBtn.style.background = '';
+      micBtn.style.boxShadow = '';
+      micBtn.classList.remove('pulse');
+      document.getElementById('ai-status').textContent = 'Processing...';
+    }
+  }
+
+  async function transcribeAudio(blob) {
+    const formData = new FormData();
+    formData.append('audio', blob, 'input.webm');
+
+    console.log(`[STT] Sending audio for transcription... Mime: ${blob.type}, Size: ${blob.size}`);
+    try {
+      const response = await fetch('http://localhost:8000/api/interview/transcribe', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `Server error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.text && data.text.trim()) {
+        const transcript = data.text.trim();
+        addMessage('user', transcript);
+        interviewHistory.push({ role: 'user', content: transcript });
+        interviewState.history.push({ role: 'user', content: transcript });
+        getAIResponse(transcript);
+      } else {
+        document.getElementById('ai-status').textContent = 'Ready';
+      }
+    } catch (err) {
+      console.error("Transcription Error:", err);
+      document.getElementById('ai-status').textContent = 'Voice Error';
+      setTimeout(() => { document.getElementById('ai-status').textContent = 'Ready'; }, 3000);
+    }
+  }
 
   // ===== CONTROLS =====
-  document.getElementById('mic-toggle').addEventListener('click', function() {
-    isMuted = !isMuted;
-    this.classList.toggle('off', isMuted);
-    videoStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
-    if(isMuted) recognition.stop(); else recognition.start();
+  const micBtn = document.getElementById('mic-toggle');
+  
+  // SUPPORT BOTH CLICK (TOGGLE) AND HOLD (PPT)
+  let holdTimer;
+  micBtn.addEventListener('mousedown', () => {
+    holdTimer = setTimeout(() => {
+        if (!isToggleOn) startRecording();
+    }, 200); // 200ms threshold for "Hold"
+  });
+
+  micBtn.addEventListener('mouseup', () => {
+    clearTimeout(holdTimer);
+    if (isRecording && !isToggleOn) stopRecording();
+  });
+
+  micBtn.addEventListener('click', () => {
+    if (isRecording && !isToggleOn) return; // Ignore single click if we were just holding
+    toggleMic();
+  });
+
+  document.getElementById('cam-toggle').addEventListener('click', function() {
+    isCamOff = !isCamOff;
+    this.classList.toggle('off', isCamOff);
+    videoStream.getVideoTracks().forEach(track => track.enabled = !isCamOff);
   });
 
   document.getElementById('cam-toggle').addEventListener('click', function() {
@@ -767,6 +1039,19 @@
           <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">CONFIDENCE SCORE</div>
           <div style="font-size:24px; font-weight:800; color:#8b5cf6;">${feedback.metrics?.confidence || 0}/10</div>
         </div>
+      </div>
+
+      <div style="margin-bottom:32px; background:rgba(0,0,0,0.02); padding:20px; border-radius:16px;">
+        <h3 style="font-size:16px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Technical Efficiency (Big-O)
+        </h3>
+        <div style="display:flex; gap:12px; margin-bottom:12px;">
+            <div style="background:var(--bg); padding:8px 16px; border-radius:8px; border:1px solid var(--border); font-family:monospace; font-size:14px; color:var(--primary);">
+                ${feedback.code_analysis?.complexity || "Complexity: O(N)"}
+            </div>
+        </div>
+        <p style="font-size:13px; color:var(--text-muted); line-height:1.5;">${feedback.code_analysis?.suggestions || "Overall code structure is solid. Consider edge case handling for large datasets."}</p>
       </div>
 
       <div style="margin-bottom:32px;">

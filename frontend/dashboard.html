@@ -144,9 +144,17 @@
     .btn-upgrade:hover { background: var(--bg-gray); }
 
     /* ===== DASHBOARD CARDS ===== */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 32px;
+      margin-top: 32px;
+    }
+    @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } }
+
     .dashboard-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 24px;
     }
 
@@ -363,46 +371,90 @@
     </div>
   </header>
 
-  <div class="dashboard-grid">
-    <div class="hero-card">
-      <div class="hero-card-pattern"></div>
-      <div>
-        <h2>Ready for your next<br/>big interview?</h2>
-        <p>Start a realistic AI-powered simulation tailored to your target company and role. Get instant feedback on your tone, content, and confidence.</p>
+  <div class="main-grid">
+    <!-- Primary Content -->
+    <div style="display:flex; flex-direction:column; gap:32px;">
+      <div class="hero-card">
+        <div class="hero-card-pattern"></div>
+        <div>
+          <h2>Ready for your next<br/>big interview?</h2>
+          <p>Start a realistic AI-powered simulation tailored to your target company and role. Get instant feedback on your tone, content, and confidence.</p>
+        </div>
+        <a href="#" class="btn-start" onclick="startNewInterview()">
+          Start New Simulation &rarr;
+        </a>
       </div>
-      <a href="#" class="btn-start" onclick="startNewInterview()">
-        Start New Simulation &rarr;
-      </a>
-    </div>
 
-    <div class="stats-card">
-      <div class="stats-card-header">
-        <span>Average Score</span>
-        <div class="status-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17 5.8 21.3l2.4-7.4L2 9.4h7.6L12 2z"/></svg></div>
-      </div>
-      <div>
-        <div class="stats-value" id="avg-score-val">--%</div>
-        <div class="stats-diff">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-          <span id="avg-score-diff">0% from last session</span>
+      <div class="dashboard-grid">
+        <div class="stats-card">
+          <div class="stats-card-header">
+            <span>Average Score</span>
+            <div class="status-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17 5.8 21.3l2.4-7.4L2 9.4h7.6L12 2z"/></svg></div>
+          </div>
+          <div>
+            <div class="stats-value" id="avg-score-val">--%</div>
+            <div class="stats-diff">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              <span id="avg-score-diff">0% from last session</span>
+            </div>
+          </div>
+          <div style="margin-top:20px; height:4px; background:var(--bg-gray); border-radius:2px; overflow:hidden;">
+            <div id="avg-score-progress" style="width:0%; height:100%; background:var(--blue); border-radius:2px;"></div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-rows: 1fr 1fr; gap:16px;">
+            <div class="stats-card" style="padding:16px;">
+                 <span style="font-size:12px; color:var(--muted); font-weight:600;">CLARITY</span>
+                 <div id="avg-clarity-val" style="font-size:18px; font-weight:800; color:var(--blue); margin-top:4px;">--%</div>
+            </div>
+            <div class="stats-card" style="padding:16px;">
+                <span style="font-size:12px; color:var(--muted); font-weight:600;">FILLER WORDS</span>
+                <div id="avg-filler-val" style="font-size:18px; font-weight:800; color:var(--warning); margin-top:4px;">--</div>
+            </div>
         </div>
       </div>
-      <div style="margin-top:20px; height:4px; background:var(--bg-gray); border-radius:2px; overflow:hidden;">
-        <div id="avg-score-progress" style="width:0%; height:100%; background:var(--blue); border-radius:2px;"></div>
+
+      <section>
+        <div class="section-header" id="recent-simulations">
+          <h3>Recent Simulations</h3>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <button onclick="clearHistory()" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:12px; font-weight:600;">Clear History</button>
+            <a href="#" class="section-link">View all history &rarr;</a>
+          </div>
+        </div>
+        
+        <div class="interview-list" id="interview-list">
+          <div style="padding:40px; text-align:center; color:var(--muted); font-size:14px;">Loading simulations...</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Sidebar (Leaderboard) -->
+    <div style="display:flex; flex-direction:column; gap:24px;">
+      <div class="stats-card" style="height:auto; border: 1.5px solid var(--blue-light);">
+        <div class="section-header" style="margin-bottom:20px;">
+          <h3 style="font-size:16px;">Global Top Performers</h3>
+        </div>
+        <div id="leaderboard-list" style="display:flex; flex-direction:column; gap:10px;">
+          <div style="padding:40px; text-align:center; color:var(--muted); font-size:12px;">Rankings loading...</div>
+        </div>
+        
+        <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border);">
+            <div style="font-size:11px; color:var(--muted); font-weight:700; margin-bottom:12px; text-transform:uppercase;">Your Global Standing</div>
+            <div id="user-standing-card">
+                 <div style="font-size:14px; color:var(--muted);">Complete an interview to see your rank.</div>
+            </div>
+        </div>
+      </div>
+
+      <div class="stats-card" style="background: linear-gradient(135deg, var(--blue), #4338ca); color: white;">
+          <h3 style="color:white; font-size:16px;">Pro Tips</h3>
+          <p style="font-size:13px; margin: 12px 0; opacity:0.9; line-height:1.5;">Maintaining eye contact during technical explanations improves your clarity score by up to 25%.</p>
+          <button style="width:100%; padding:10px; border-radius:10px; border:none; background:rgba(255,255,255,0.2); color:white; font-weight:700; cursor:pointer;">Learn more</button>
       </div>
     </div>
   </div>
-
-  <section>
-    <div class="section-header" id="recent-simulations">
-      <h3>Recent Simulations</h3>
-      <a href="#" class="section-link">View all history &rarr;</a>
-    </div>
-    
-    <div class="interview-list" id="interview-list">
-      <div style="padding:40px; text-align:center; color:var(--muted); font-size:14px;">Loading simulations...</div>
-    </div>
-  </section>
 
   <!-- Interview Detail Modal -->
   <div class="modal-overlay" id="detail-modal">
@@ -440,18 +492,6 @@
     </div>
   </div>
 
-  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
-    <div class="stats-card">
-        <div class="stats-card-header"><span>Clarity Score</span></div>
-        <div class="stats-value" id="avg-clarity-val" style="color:var(--success);">--</div>
-        <p id="avg-clarity-text" style="font-size:12px; color:var(--muted);">Complete a simulation to see your score.</p>
-    </div>
-    <div class="stats-card">
-        <div class="stats-card-header"><span>Filler Words</span></div>
-        <div class="stats-value" id="avg-filler-val" style="color:var(--warning);">--</div>
-        <p id="avg-filler-text" style="font-size:12px; color:var(--muted);">Complete a simulation to see your analytics.</p>
-    </div>
-  </div>
   </div>
 
   <!-- Selection Modal Slides -->
@@ -468,21 +508,21 @@
           <p>The AI will calibrate its questions to this specific career track.</p>
         </div>
         <div class="card-grid" id="role-options">
-          <div class="select-card" onclick="selectRole('Frontend Engineer', this)">
-            <h4>Frontend Engineer</h4>
-            <p>React, UI Architecture, Performance</p>
+          <div class="select-card" onclick="selectRole('Software Engineer', this)">
+            <h4>Software Engineer</h4>
+            <p>Algorithms, System Design, Logic</p>
           </div>
-          <div class="select-card" onclick="selectRole('Backend Engineer', this)">
-            <h4>Backend Engineer</h4>
-            <p>Node.js, Databases, Scalability</p>
+          <div class="select-card" onclick="selectRole('AI Analyst', this)">
+            <h4>AI Analyst</h4>
+            <p>LLMs, Data Insights, Prompt Engineering</p>
           </div>
           <div class="select-card" onclick="selectRole('Fullstack Developer', this)">
             <h4>Fullstack Developer</h4>
             <p>End-to-end integration, APIs</p>
           </div>
-          <div class="select-card" onclick="selectRole('Product Manager', this)">
-            <h4>Product Manager</h4>
-            <p>Strategy, Roadmap, User Centricity</p>
+          <div class="select-card" onclick="selectRole('Data Scientist', this)">
+            <h4>Data Scientist</h4>
+            <p>Machine Learning, Statistics, Modeling</p>
           </div>
         </div>
         <div class="setup-footer">
@@ -597,7 +637,8 @@
   }
 
   function confirmAndLaunch() {
-    const finalCompany = 'General'; 
+    if(!selectedRole) return alert("Select a role!");
+    const finalCompany = 'General';
     window.location.href = `simulator.html?role=${encodeURIComponent(selectedRole)}&company=${encodeURIComponent(finalCompany)}`;
   }
 
@@ -664,15 +705,14 @@
       list.innerHTML = data.map(item => `
         <div class="interview-row" onclick="viewSimulation('${item._id}')">
           <div class="role-info">
-            <div class="comp-logo">${item.company.charAt(0)}</div>
-            <div class="role-details">
-              <h4>${item.company} — ${item.role}</h4>
-              <p>${item.status === 'completed' ? 'Finished' : 'In Progress'} Simulation</p>
+            <div class="role-details" style="padding-left: 0;">
+              <h4>${item.role} Interview</h4>
+              <p>${item.status === 'completed' ? 'Finished' : 'In Progress'} Assessment</p>
             </div>
           </div>
-          <div class="score-badge">
-            <div class="score-val">${item.overallScore}/100</div>
-            <div class="score-date">${new Date(item.createdAt).toLocaleDateString()}</div>
+          <div class="score-badge" style="text-align: right;">
+            <div class="score-val" style="margin-bottom: 4px;">${item.overallScore}/100</div>
+            <div class="score-date" style="font-size: 11px; color: var(--text-muted);">${new Date(item.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</div>
           </div>
         </div>
       `).join('');
@@ -682,12 +722,32 @@
     }
   }
 
+  async function clearHistory() {
+    if (!confirm("Are you sure you want to delete all simulation history? This action cannot be undone.")) return;
+    
+    const userId = localStorage.getItem('user_email') || 'demo_user';
+    try {
+      const response = await fetch('http://localhost:8000/api/interview/all', {
+        method: 'DELETE',
+        headers: { 'user-id': userId }
+      });
+      if (response.ok) {
+        location.reload();
+      } else {
+        alert("Failed to clear history.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error clearing history.");
+    }
+  }
+
   async function viewSimulation(id) {
     try {
       const response = await fetch(`http://localhost:8000/api/interview/${id}`);
       const item = await response.json();
 
-      document.getElementById('modal-title').textContent = `${item.company} — ${item.role}`;
+      document.getElementById('modal-title').textContent = `${item.role} Assessment`;
       document.getElementById('modal-date').textContent = new Date(item.createdAt).toLocaleString();
       document.getElementById('modal-score').textContent = `${item.overallScore}/100`;
       document.getElementById('modal-feedback').textContent = item.feedback || "No feedback available for this session.";
@@ -713,8 +773,48 @@
     document.getElementById('detail-modal').classList.remove('active');
   }
 
+  async function fetchLeaderboard() {
+    try {
+        const response = await fetch('http://localhost:8000/api/interview/leaderboard');
+        const data = await response.json();
+        const listEl = document.getElementById('leaderboard-list');
+        const userStandingEl = document.getElementById('user-standing-card');
+        const myEmail = localStorage.getItem('user_email') || 'demo_user';
+
+        listEl.innerHTML = '';
+        data.forEach((entry, i) => {
+            const isMe = entry._id === myEmail;
+            if (isMe) {
+                userStandingEl.innerHTML = `
+                  <div style="display:flex; align-items:center; gap:12px; padding:12px; border-radius:12px; background:var(--blue-light); border:1.5px solid var(--blue)">
+                    <div style="width:24px; font-weight:900; font-size:16px; color:var(--blue)">#${i+1}</div>
+                    <img src="https://ui-avatars.com/api/?name=${entry._id}&background=fff&color=2563eb&bold=true" style="width:28px; height:28px; border-radius:50%;">
+                    <div style="flex:1; font-size:13px; font-weight:700; color:var(--text-dark);">Top ${Math.round(((i+1)/data.length)*100)}% Global</div>
+                    <div style="font-weight:900; font-size:14px; color:var(--text-dark);">${entry.maxScore}%</div>
+                  </div>
+                `;
+            }
+            
+            listEl.innerHTML += `
+                <div style="display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; background:${isMe ? 'var(--blue-light)' : 'rgba(0,0,0,0.02)'}; border:${isMe ? '1px solid var(--blue)' : '1px solid transparent'}">
+                    <div style="width:20px; font-weight:900; font-size:11px; color:${i < 3 ? 'var(--blue)' : 'var(--muted)'}">#${i+1}</div>
+                    <img src="https://ui-avatars.com/api/?name=${entry._id}&background=fff&color=2563eb&bold=true" style="width:24px; height:24px; border-radius:50%;">
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-size:11px; font-weight:700; color:var(--text-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${entry._id.split('@')[0]}</div>
+                        <div style="font-size:9px; color:var(--muted);">${entry.latestRole}</div>
+                    </div>
+                    <div style="font-weight:800; font-size:12px; color:var(--text-dark);">${entry.maxScore}%</div>
+                </div>
+            `;
+        });
+    } catch (e) {
+        console.error(e);
+    }
+  }
+
   // Initial Fetch
   fetchSimulations();
+  fetchLeaderboard();
 </script>
 
 </body>

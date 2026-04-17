@@ -197,51 +197,27 @@
   <header style="display:flex; align-items:flex-start; justify-content:space-between;">
     <div class="header-info">
       <h1>Career Intelligence</h1>
-      <p>AI-powered insights for your growth as a <strong id="user-role">Software Engineer</strong>.</p>
+      <p>AI-powered insights for your growth as a <strong id="user-role">Software Engineer</strong> <span style="background:var(--blue-light); color:var(--blue); font-size:10px; padding:2px 8px; border-radius:10px; margin-left:8px; vertical-align:middle;">PERSONALIZED</span></p>
     </div>
   </header>
 
   <section class="path-container">
     <h3>Recommended Path</h3>
     <div class="path-connector"></div>
-    <div class="path-timeline">
+    <div class="path-timeline" id="roadmap-timeline">
       <div class="path-node active">
         <span>Current</span>
-        <h4>Senior Engineer</h4>
-        <span>Score: 78%</span>
-      </div>
-      <div class="path-node">
-        <span>Step 1</span>
-        <h4>Staff Architect</h4>
-        <span>Est. 12-18mo</span>
-      </div>
-      <div class="path-node">
-        <span>Step 2</span>
-        <h4>Eng Director</h4>
-        <span>Est. 3-5yr</span>
+        <h4>Starting Growth</h4>
+        <span>Score: --%</span>
       </div>
     </div>
   </section>
 
   <div class="intel-grid">
     <div class="intel-card">
-      <h3>Skills Gap Analysis</h3>
-      <div class="skill-list">
-        <div class="skill-row">
-          <span class="skill-label">React & Next.js</span>
-          <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:92%;"></div></div>
-          <span class="skill-label" style="color:var(--success);">Expert</span>
-        </div>
-        <div class="skill-row">
-          <span class="skill-label">Cloud (AWS/GCP)</span>
-          <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:45%; background:var(--warning);"></div></div>
-          <span class="skill-label" style="color:var(--warning);">Need Improv.</span>
-        </div>
-        <div class="skill-row">
-          <span class="skill-label">Architecture</span>
-          <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:68%;"></div></div>
-          <span class="skill-label">Good</span>
-        </div>
+      <h3>Skills Focus Gaps</h3>
+      <div class="skill-list" id="skill-gap-list">
+        <!-- Dynamic content filled by JS -->
       </div>
     </div>
 
@@ -272,7 +248,66 @@
 
     const role = localStorage.getItem('user_role') || 'Software Engineer';
     document.getElementById('user-role').textContent = role;
+    
+    fetchIntelligence();
   });
+
+  async function fetchIntelligence() {
+    const userId = localStorage.getItem('user_email') || 'demo_user';
+    try {
+      const response = await fetch('http://localhost:8000/api/interview/all', {
+        headers: { 'user-id': userId }
+      });
+      const data = await response.json();
+      const lastCompleted = data.find(i => i.status === 'completed');
+      
+      if (lastCompleted) {
+        const feedback = JSON.parse(lastCompleted.feedback);
+        renderRoadmap(lastCompleted.overallScore, feedback.roadmap);
+        renderSkills(feedback.improvement);
+      }
+    } catch (e) { 
+        console.error(e); 
+    }
+  }
+
+  function renderRoadmap(score, steps) {
+    const timeline = document.getElementById('roadmap-timeline');
+    if (!steps) return;
+    
+    let html = `
+      <div class="path-node active">
+        <span>Latest Assessment</span>
+        <h4>Session Score</h4>
+        <span>${score}%</span>
+      </div>
+    `;
+    
+    steps.forEach((step, i) => {
+        html += `
+          <div class="path-node">
+            <span>Step ${i+1}</span>
+            <h4>${step}</h4>
+            <span>Est. 2-4 weeks</span>
+          </div>
+        `;
+    });
+    
+    timeline.innerHTML = html;
+  }
+
+  function renderSkills(improvements) {
+    const list = document.getElementById('skill-gap-list');
+    if (!improvements) return;
+    
+    list.innerHTML = improvements.map(topic => `
+      <div class="skill-row">
+        <span class="skill-label">${topic}</span>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:40%; background:var(--warning);"></div></div>
+        <a href="https://www.google.com/search?q=learn+${encodeURIComponent(topic)}" target="_blank" style="font-size:12px; color:var(--blue); font-weight:700; text-decoration:none;">LEARN &rarr;</a>
+      </div>
+    `).join('');
+  }
 
   // Theme Toggle Logic
   const themeToggle = document.getElementById('theme-toggle');

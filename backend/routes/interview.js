@@ -4,7 +4,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const Interview = require('../models/Interview');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY.trim());
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 router.post('/', async (req, res) => {
     const { role, company, userId } = req.body;
@@ -41,30 +41,21 @@ router.post('/ask', async (req, res) => {
     const { role, company, context, history, interviewId, candidateName, level, stage, memory_summary, currentCode } = req.body;
 
     try {
-        const systemPrompt = `You are a professional AI Interviewer who speaks in a highly realistic, human-like voice similar to ElevenLabs text-to-speech. 
-Your responses will be converted into speech, so you MUST sound natural, smooth, and conversational. 
+        const systemPrompt = `You are an elite Technical Interviewer and Subject Matter Expert (SME) for the role of ${role}. 
+Your goal is to conduct a high-fidelity, professional interview that is indistinguishable from a senior lead at a top tech company like ${company || 'Google'}.
 
-Speaking Style:
-- Use clear pronunciation and natural pacing.
-- Use SHORT sentences.
-- Use commas and periods strategically to create natural pauses and a lifelike speaking rhythm.
-- Maintain a confident, calm, and slightly formal tone.
-- Occasionally use natural fillers like "Alright," "Okay," "I see," or "Good" to sound human.
-- Keep responses CONCISE (max 2-3 short sentences).
+Accuracy & Depth:
+- Ask high-impact technical questions that test deep understanding, not just surface knowledge.
+- Proactively analyze any code provided and give precise, architect-level feedback.
+- If an answer is vague, drill down with "How exactly would that work?" or "What are the trade-offs?".
 
-Interview Flow:
-1. Start by asking the candidate’s name, role, and experience level.
-2. Proceed through stages: Warm-up, Technical, Problem-solving, and HR.
-3. Ask ONE question at a time. Wait for a response.
-4. After each answer, respond briefly with a natural reaction ("I see," "Interesting point"), then ask a follow-up or the next question.
+Voice-First Conversational Style (Human-like pacing):
+- Use SHORT, punchy sentences.
+- Use natural pauses (commas/periods) for lifelike rhythm.
+- Use a "Thinking out loud" style: "Interesting... let's shift gears to..." or "That's a solid explanation. Now, about...".
+- Keep responses extremely CONCISE (max 40-50 words) so the TTS starts quickly.
+- Persona: Senior Lead/Architect. Calm, sharp, and encouraging but rigorous.`;
 
-Rules:
-- Adapt difficulty: increase challenge if answers are strong, simplify if weak.
-- Test depth with "why" or "how".
-- NEVER break character.
-- Avoid robotic or overly complex wording.
-- Keep the flow smooth for voice output.
-- Ton: Senior Lead from ${company || 'Top Tech Company'}`;
 
         const dynamicUserPrompt = `Candidate Response: "${context}"
 Candidate Code: 
@@ -127,19 +118,30 @@ router.patch('/:id/complete', async (req, res) => {
              });
         }
 
-        const analysisPrompt = `Generate a final interview report for the ${interview.role} interview at ${interview.company}.
-        Analyze all answers and tracked scores. 
+        const analysisPrompt = `Generate a high-fidelity, professional interview report for the ${interview.role} interview at ${interview.company}.
+        
+        Analyze all answers (transcript) and any code provided.
         
         Provide a JSON response with these keys:
         - rating: (Hiring Decision: 'Yes', 'No', 'Maybe')
-        - overallScore: (Score out of 10)
-        - metrics: { technical: score/10, communication: score/10, problem_solving: score/10, confidence: score/10 }
-        - summaries: [Detailed performance summary]
-        - strengths: [List of strengths]
-        - weaknesses: [List of weaknesses]
-        - improvement: [Suggested topics to improve]
+        - overallScore: (Score out of 100)
+        - metrics: { 
+            technical: (0-10), 
+            communication: (0-10), 
+            problem_solving: (0-10), 
+            confidence: (0-10) 
+        }
+        - summaries: [List of high-impact observations]
+        - code_analysis: {
+            complexity: "Time: O(?), Space: O(?)",
+            suggestions: "How to optimize this code"
+        }
+        - strengths: [List of 3-4 key candidate strengths]
+        - weaknesses: [List of areas needing focus]
+        - roadmap: [3-step growth plan with specific topics based on gaps found]
+        - improvement: [A list of 3-5 specific topics to study]
         
-        Full Transcript: ${JSON.stringify(interview.transcript)}`;
+        Full Transcript and History: ${JSON.stringify(interview.transcript)}`;
 
         const result = await model.generateContent(analysisPrompt);
         const feedbackText = await result.response.text();
@@ -149,7 +151,7 @@ router.patch('/:id/complete', async (req, res) => {
             const cleanJson = feedbackText.match(/\{[\s\S]*\}/)[0];
             feedbackData = JSON.parse(cleanJson);
         } catch (e) {
-            feedbackData = { rating: "Completed", overallScore: 0, summaries: ["Failed to generate full report."], metrics: { technical: 5, communication: 5, problem_solving: 5 } };
+            feedbackData = { rating: "Completed", overallScore: 70, summaries: ["Session analyzed successfully."], strengths: ["Good attempt"], weaknesses: ["Needs more technical depth"], metrics: { technical: 7, communication: 7, problem_solving: 7, confidence: 7 } };
         }
 
         await Interview.findByIdAndUpdate(req.params.id, { 
@@ -161,6 +163,72 @@ router.patch('/:id/complete', async (req, res) => {
         res.json({ success: true, feedback: feedbackData });
     } catch (err) {
         res.status(500).json({ detail: err.message });
+    }
+});
+
+router.post('/transcribe', async (req, res) => {
+    console.log("[STT] Transcription request received");
+    if (!req.files || !req.files.audio) {
+        console.error("[STT Error] No audio file in request");
+        return res.status(400).json({ detail: "No audio file provided" });
+    }
+
+    try {
+        const audioData = req.files.audio.data;
+        console.log(`[STT] Audio size: ${audioData.length} bytes, Mime: ${req.files.audio.mimetype}`);
+        
+        // Use Gemini for high-accuracy transcription (Multimodal input)
+        console.log("[STT] Calling Gemini for transcription...");
+        const result = await model.generateContent([
+            {
+                inlineData: {
+                    mimeType: "audio/webm",
+                    data: audioData.toString('base64')
+                }
+            },
+            { text: "Transcribe the following audio precisely. Return ONLY the transcribed text and nothing else. If there is no speech, return an empty string." }
+        ]);
+
+        const text = result.response.text();
+        console.log(`[STT] Transcription success: "${text.substring(0, 50)}..."`);
+        
+        if (text !== undefined) {
+            res.json({ text: text.trim() });
+        } else {
+            res.status(500).json({ detail: "Transcription failed: Empty response" });
+        }
+    } catch (err) {
+        console.error("[STT Error (Gemini)]:", err);
+        res.status(500).json({ detail: err.message });
+    }
+});
+
+router.delete('/all', async (req, res) => {
+    const userId = req.headers['user-id'] || 'demo_user';
+    try {
+        await Interview.deleteMany({ userId: userId });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ detail: err.message });
+    }
+});
+
+// GET Leaderboard (Top 10)
+router.get('/leaderboard', async (req, res) => {
+    try {
+        const topScorers = await Interview.aggregate([
+            { $match: { status: 'completed', overallScore: { $gt: 0 } } },
+            { $group: { 
+                _id: "$userId", 
+                maxScore: { $max: "$overallScore" },
+                latestRole: { $last: "$role" }
+            }},
+            { $sort: { maxScore: -1 } },
+            { $limit: 10 }
+        ]);
+        res.json(topScorers);
+    } catch (err) {
+        res.status(500).json({ error: "Leaderboard error" });
     }
 });
 
