@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const resumeSchema = new mongoose.Schema({
     userId: { type: String, required: true },
+    filename: { type: String },
     template: { type: String, default: 'modern-dark' },
     data: {
         name: String,
@@ -26,6 +27,12 @@ const resumeSchema = new mongoose.Schema({
             name: String,
             level: Number
         }]
+    },
+    analysis: {
+        atsScore: Number,
+        summary: String,
+        topSkills: [String],
+        missingSkills: [String]
     },
     createdAt: { type: Date, default: Date.now }
 });

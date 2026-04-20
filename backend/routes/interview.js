@@ -4,7 +4,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const Interview = require('../models/Interview');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY.trim());
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
 router.post('/', async (req, res) => {
     const { role, company, userId } = req.body;
@@ -39,6 +39,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/ask', async (req, res) => {
     const { role, company, context, history, interviewId, candidateName, level, stage, memory_summary, currentCode } = req.body;
+    console.log(`[Interview] Ask request for role: ${role}, context: ${context}, id: ${interviewId}`);
 
     try {
         const systemPrompt = `You are an elite Technical Interviewer and Subject Matter Expert (SME) for the role of ${role}. 
@@ -97,7 +98,8 @@ Instructions:
 
         res.json({ answer: text });
     } catch (err) {
-        console.error("Gemini Error:", err);
+        console.error("DEBUG - Gemini Error Full Object:", JSON.stringify(err, null, 2));
+        console.error("DEBUG - Gemini Error Message:", err.message);
         res.status(500).json({ answer: "AI glitch. Please try again.", detail: err.message });
     }
 });

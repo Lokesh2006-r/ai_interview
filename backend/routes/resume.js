@@ -115,7 +115,21 @@ router.post('/upload', async (req, res) => {
         const responseText = await callHuggingFace(prompt);
         const analysis = parseAIJson(responseText);
 
-        res.json(analysis);
+        // Save to database
+        const userId = req.body.userId || getUserId(req);
+        const newResume = new Resume({
+            userId,
+            filename: file.name,
+            analysis: {
+                atsScore: analysis.atsScore,
+                summary: analysis.summary,
+                topSkills: analysis.topSkills,
+                missingSkills: analysis.missingSkills
+            }
+        });
+        await newResume.save();
+
+        res.json({ success: true, analysis, resumeId: newResume._id });
     } catch (err) {
         console.error("Analysis Error:", err);
         res.status(500).json({ success: false, detail: "Deep Analysis Failed: " + err.message });
@@ -143,6 +157,28 @@ router.post('/analyze', async (req, res) => {
         const responseText = await callHuggingFace(prompt);
         const data = parseAIJson(responseText);
         res.json(data);
+    } catch (err) {
+        res.status(500).json({ detail: err.message });
+    }
+});
+
+// GET all resumes for a user
+router.get('/all', async (req, res) => {
+    const userId = req.query.userId || getUserId(req);
+    try {
+        const resumes = await Resume.find({ userId }).sort({ createdAt: -1 });
+        res.json(resumes);
+    } catch (err) {
+        res.status(500).json({ detail: err.message });
+    }
+});
+
+// DELETE a resume
+router.delete('/:id', async (req, res) => {
+    try {
+        const result = await Resume.findByIdAndDelete(req.params.id);
+        if (!result) return res.status(404).json({ detail: "Resume not found" });
+        res.json({ success: true, message: "Resume removed from portfolio" });
     } catch (err) {
         res.status(500).json({ detail: err.message });
     }

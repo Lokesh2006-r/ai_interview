@@ -321,7 +321,21 @@
     }
     .btn-next:hover { transform: scale(1.02); }
     .btn-back { background: none; border: none; color: var(--muted); font-weight: 600; cursor: pointer; }
+
+    /* ===== ANALYTICS SECTION ===== */
+    .analytics-card {
+      background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 24px;
+      padding: 32px; box-shadow: var(--shadow);
+    }
+    .analytics-footer {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+      margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);
+    }
+    .a-stat { display: flex; flex-direction: column; gap: 4px; }
+    .a-stat span { font-size: 20px; font-weight: 800; color: var(--text-dark); }
+    .a-stat label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -394,7 +408,7 @@
       <div class="dashboard-grid">
         <div class="stats-card">
           <div class="stats-card-header">
-            <span>Average Score</span>
+            <span>Overall Proficiency</span>
             <div class="status-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17 5.8 21.3l2.4-7.4L2 9.4h7.6L12 2z"/></svg></div>
           </div>
           <div>
@@ -405,27 +419,51 @@
             </div>
           </div>
           <div style="margin-top:20px; height:4px; background:var(--bg-gray); border-radius:2px; overflow:hidden;">
-            <div id="avg-score-progress" style="width:0%; height:100%; background:var(--blue); border-radius:2px;"></div>
+            <div id="avg-score-progress" style="width:0%; height:100%; background:var(--primary); border-radius:2px;"></div>
           </div>
         </div>
 
         <div style="display:grid; grid-template-rows: 1fr 1fr; gap:16px;">
             <div class="stats-card" style="padding:16px;">
-                 <span style="font-size:12px; color:var(--muted); font-weight:600;">CLARITY</span>
-                 <div id="avg-clarity-val" style="font-size:18px; font-weight:800; color:var(--blue); margin-top:4px;">--%</div>
+                 <span style="font-size:12px; color:var(--muted); font-weight:600;">ACTIVE TIME</span>
+                 <div id="total-time-val" style="font-size:18px; font-weight:800; color:var(--primary); margin-top:4px;">0.0 hrs</div>
             </div>
             <div class="stats-card" style="padding:16px;">
-                <span style="font-size:12px; color:var(--muted); font-weight:600;">FILLER WORDS</span>
-                <div id="avg-filler-val" style="font-size:18px; font-weight:800; color:var(--warning); margin-top:4px;">--</div>
+                <span style="font-size:12px; color:var(--muted); font-weight:600;">CONFIDENCE</span>
+                <div id="confidence-val" style="font-size:18px; font-weight:800; color:var(--accent); margin-top:4px;">--/10</div>
             </div>
         </div>
       </div>
+
+      <section class="analytics-card">
+        <div class="section-header">
+          <h3>Daily Performance Analytics</h3>
+          <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">LAST 7 DAYS</span>
+        </div>
+        <div style="height: 220px; position: relative;">
+          <canvas id="performanceChart"></canvas>
+        </div>
+        <div class="analytics-footer">
+          <div class="a-stat">
+            <span id="sessions-count">0</span>
+            <label>Interviews</label>
+          </div>
+          <div class="a-stat">
+            <span id="accuracy-avg">0%</span>
+            <label>Avg. Accuracy</label>
+          </div>
+          <div class="a-stat">
+            <span id="peak-score">0%</span>
+            <label>Peak Score</label>
+          </div>
+        </div>
+      </section>
 
       <section>
         <div class="section-header" id="recent-simulations">
           <h3>Recent Simulations</h3>
           <div style="display: flex; gap: 12px; align-items: center;">
-            <button onclick="clearHistory()" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:12px; font-weight:600;">Clear History</button>
+            <button onclick="clearHistory()" style="background:transparent; border:none; color:var(--error); cursor:pointer; font-size:12px; font-weight:600;">Clear History</button>
             <a href="#" class="section-link">View all history &rarr;</a>
           </div>
         </div>
@@ -649,6 +687,8 @@
   }
 
   // Simulation Logic
+  let performanceChart = null;
+
   async function fetchSimulations() {
     const userId = localStorage.getItem('user_email') || 'demo_user';
     try {
@@ -657,51 +697,48 @@
       });
       const data = await response.json();
       
-      // Update Real Stats
-      if (data.length > 0) {
-        const completedSessions = data.filter(d => d.status === 'completed');
-        if (completedSessions.length > 0) {
-          const totalScore = completedSessions.reduce((acc, item) => acc + (item.overallScore || 0), 0);
-          const avgScore = Math.round(totalScore / completedSessions.length);
-          
-          document.getElementById('avg-score-val').textContent = `${avgScore}%`;
-          document.getElementById('avg-score-progress').style.width = `${avgScore}%`;
-          
-          // Calculate diff from the previous completed session
-          // Calculate Clarity & Fillers
-          let totalClarity = 0;
-          let totalFillers = 0;
-          let metricSessions = 0;
+      const completedSessions = data.filter(d => d.status === 'completed');
+      
+      // 1. Calculate Core Analytics
+      if (completedSessions.length > 0) {
+        const totalScore = completedSessions.reduce((acc, item) => acc + (item.overallScore || 0), 0);
+        const avgScore = Math.round(totalScore / completedSessions.length);
+        const peakScore = Math.max(...completedSessions.map(s => s.overallScore || 0));
+        
+        document.getElementById('avg-score-val').textContent = `${avgScore}%`;
+        document.getElementById('avg-score-progress').style.width = `${avgScore}%`;
+        document.getElementById('sessions-count').textContent = completedSessions.length;
+        document.getElementById('accuracy-avg').textContent = `${avgScore}%`;
+        document.getElementById('peak-score').textContent = `${peakScore}%`;
 
-          completedSessions.forEach(s => {
-            try {
-              const fb = JSON.parse(s.feedback);
-              if (fb.metrics) {
-                totalClarity += (fb.metrics.clarity || fb.metrics.communication || 0);
-                totalFillers += (fb.metrics.fillerCount || 0);
-                metricSessions++;
-              }
-            } catch(e) {}
-          });
+        // Estimate time spent (approx 3 mins per transcript exchange)
+        let totalMinutes = 0;
+        let totalConfidence = 0;
+        let metricCount = 0;
 
-          if (metricSessions > 0) {
-            const avgClarity = (totalClarity / metricSessions).toFixed(1);
-            const avgFillers = Math.round(totalFillers / metricSessions);
+        completedSessions.forEach(s => {
+          totalMinutes += (s.transcript?.length || 0) * 1.5; // Roughly 1.5 mins per back-and-forth
+          try {
+            const fb = JSON.parse(s.feedback);
+            if (fb.metrics && fb.metrics.confidence) {
+              totalConfidence += fb.metrics.confidence;
+              metricCount++;
+            }
+          } catch(e) {}
+        });
 
-            const clarityLabel = avgClarity >= 8 ? 'High' : (avgClarity >= 5 ? 'Medium' : 'Needs Focus');
-            const clarityColor = avgClarity >= 8 ? 'var(--success)' : (avgClarity >= 5 ? 'var(--warning)' : 'var(--danger)');
-
-            document.getElementById('avg-clarity-val').textContent = clarityLabel;
-            document.getElementById('avg-clarity-val').style.color = clarityColor;
-            document.getElementById('avg-clarity-text').textContent = `Avg Score: ${avgClarity}/10 — Based on your last ${metricSessions} sessions.`;
-
-            document.getElementById('avg-filler-val').textContent = avgFillers;
-            document.getElementById('avg-filler-val').style.color = avgFillers < 50 ? 'var(--success)' : (avgFillers < 100 ? 'var(--warning)' : 'var(--danger)');
-            document.getElementById('avg-filler-text').textContent = `Average filler words per session. Aim for <50.`;
-          }
+        document.getElementById('total-time-val').textContent = `${(totalMinutes / 60).toFixed(1)} hrs`;
+        
+        if (metricCount > 0) {
+          const avgConfidence = (totalConfidence / metricCount).toFixed(1);
+          document.getElementById('confidence-val').textContent = `${avgConfidence}/10`;
         }
+
+        // 2. Prepare Data for Trend Chart (Last 7 Days)
+        renderPerformanceChart(completedSessions);
       }
 
+      // 3. Render List
       const list = document.getElementById('interview-list');
       if (data.length === 0) {
         list.innerHTML = '<div style="padding:40px; text-align:center; color:var(--muted); font-size:14px;">No simulations found. Start one above!</div>';
@@ -726,6 +763,71 @@
       console.error(err);
       document.getElementById('interview-list').innerHTML = '<div style="padding:40px; text-align:center; color:var(--error); font-size:14px;">Failed to load simulations.</div>';
     }
+  }
+
+  function renderPerformanceChart(sessions) {
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    // Group by date
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push(d.toLocaleDateString([], { weekday: 'short' }));
+    }
+
+    const dailyScores = new Array(7).fill(0);
+    const dailyCounts = new Array(7).fill(0);
+
+    sessions.forEach(s => {
+      const sDate = new Date(s.createdAt).toLocaleDateString([], { weekday: 'short' });
+      const index = days.indexOf(sDate);
+      if (index !== -1) {
+        dailyScores[index] += (s.overallScore || 0);
+        dailyCounts[index]++;
+      }
+    });
+
+    const finalData = dailyScores.map((s, i) => dailyCounts[i] > 0 ? Math.round(s / dailyCounts[i]) : 0);
+
+    if (performanceChart) performanceChart.destroy();
+
+    performanceChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: days,
+        datasets: [{
+          label: 'Performance Score',
+          data: finalData,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 3,
+          pointBackgroundColor: '#2563eb',
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            grid: { display: true, color: 'rgba(0,0,0,0.05)' },
+            ticks: { font: { size: 10 } }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { font: { size: 10 } }
+          }
+        }
+      }
+    });
   }
 
   async function clearHistory() {

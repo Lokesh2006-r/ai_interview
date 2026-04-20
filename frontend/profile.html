@@ -4,254 +4,363 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Your Profile — Hirvo AI</title>
+  <meta name="description" content="Manage your Hirvo AI profile, resumes, and interview achievements." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --blue: #2563eb;
-      --blue-dark: #0f172a;
-      --blue-light: #eff6ff;
-      --bg: #ffffff;
-      --bg-gray: #f8fafc;
-      --bg-card: #ffffff;
-      --text: #4b5563;
-      --text-dark: #0f172a;
-      --muted: #94a3b8;
+      --primary: #2563eb;
+      --primary-soft: rgba(37, 99, 235, 0.1);
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
       --border: #f1f5f9;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --error: #ef4444;
-      --radius-lg: 28px;
-      --radius-md: 16px;
+      --accent: #10b981;
+      --radius-xl: 32px;
+      --radius-lg: 20px;
+      --shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+      --glass: rgba(255, 255, 255, 0.7);
     }
 
     [data-theme="dark"] {
-      --bg: #09090b;
-      --bg-gray: #020617;
-      --bg-card: #111827;
-      --text: #94a3b8;
-      --text-dark: #f8fafc;
-      --muted: #64748b;
+      --bg: #020617;
+      --card: #0f172a;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
       --border: #1e293b;
-      --blue-light: rgba(37, 99, 235, 0.15);
+      --glass: rgba(15, 23, 42, 0.7);
+      --shadow: 0 20px 40px -20px rgba(0,0,0,0.3);
     }
 
+    /* Core Reset */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-gray);
-      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
       min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-      transition: background 0.3s, color 0.3s;
+      line-height: 1.6;
+      transition: all 0.3s ease;
     }
 
     /* ===== TOP NAVIGATION ===== */
     .top-nav {
-      height: 72px;
-      padding: 0 5%;
+      height: 72px; padding: 0 5%;
       background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100;
+      position: sticky; top: 0; z-index: 1000; transition: 0.3s;
     }
     [data-theme="dark"] .top-nav { background: rgba(9, 9, 11, 0.8); }
 
     .nav-left { display: flex; align-items: center; gap: 40px; }
     .nav-brand {
-      font-weight: 900; font-size: 20px; color: var(--text-dark);
-      text-decoration: none; letter-spacing: -1px;
+      font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 20px;
+      color: var(--text-dark); text-decoration: none; letter-spacing: -1px;
     }
     .nav-links { display: flex; align-items: center; gap: 8px; }
     .nav-link {
-      padding: 8px 16px; border-radius: var(--radius-md);
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 16px; border-radius: var(--radius-md);
       text-decoration: none; font-size: 14px; font-weight: 600;
       color: var(--text); transition: all 0.2s;
     }
     .nav-link:hover { background: var(--bg-gray); color: var(--text-dark); }
     .nav-link.active { background: var(--blue-light); color: var(--blue); }
 
-    main {
-      max-width: 1200px; width: 100%; margin: 60px auto;
-      padding: 0 5%; display: grid; grid-template-columns: 320px 1fr; gap: 40px;
-    }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
 
-    /* ===== SIDEBAR PROFILE ===== */
-    .profile-sidebar {
-      display: flex; flex-direction: column; gap: 24px;
+    .user-pill {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 12px; border-radius: 99px;
+      background: var(--bg-gray); border: 1px solid var(--border);
+      text-decoration: none; color: var(--text-dark);
+      transition: all 0.2s;
     }
-    .profile-card {
-      background: var(--bg-card); border: 1.5px solid var(--border);
-      border-radius: var(--radius-lg); padding: 32px;
-      text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.02);
-    }
-    .profile-avatar {
-      width: 100px; height: 100px; border-radius: 50%;
-      border: 4px solid var(--bg-gray); margin: 0 auto 20px;
-    }
-    .profile-card h2 { font-size: 20px; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
-    .profile-card p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+    .user-pill:hover { background: var(--blue-light); border-color: var(--blue); }
     
-    .profile-stats {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px;
+    .user-pill img {
+      width: 32px; height: 32px; border-radius: 50%;
+      object-fit: cover; border: 1.5px solid #fff; flex-shrink: 0;
     }
-    .p-stat {
-      background: var(--bg-gray); padding: 12px; border-radius: 12px;
-      text-align: center;
-    }
-    .p-stat-val { display: block; font-weight: 800; color: var(--text-dark); font-size: 16px; }
-    .p-stat-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
-
-    /* ===== MAIN CONTENT ===== */
-    .profile-content {
-      display: flex; flex-direction: column; gap: 40px;
+    .user-pill span {
+      font-size: 13px; font-weight: 600;
     }
 
-    .section-title {
-      font-size: 18px; font-weight: 800; color: var(--text-dark);
-      margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;
+    .theme-icon-btn {
+      width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--bg-card); color: var(--text-dark);
+      cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    }
+    .theme-icon-btn:hover { border-color: var(--blue); transform: scale(1.05); }
+    .theme-icon-btn svg { width: 18px; height: 18px; }
+
+    /* Layout */
+    .container {
+      max-width: 1240px; margin: 48px auto;
+      padding: 0 5%;
+      display: grid; grid-template-columns: 340px 1fr; gap: 48px;
     }
 
-    .resume-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 20px;
+    /* Sidebar Components */
+    .sidebar { display: flex; flex-direction: column; gap: 24px; }
+    
+    .card {
+      background: var(--card); border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 32px; box-shadow: var(--shadow);
+      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .profile-header { text-align: center; margin-bottom: 24px; }
+    .avatar-container {
+      position: relative; width: 110px; height: 110px; margin: 0 auto 20px;
+    }
+    .avatar {
+      width: 100%; height: 100%; border-radius: 50%;
+      object-fit: cover; border: 4px solid var(--card);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+    }
+    .badge-premium {
+      position: absolute; bottom: 0; right: 0;
+      background: var(--primary); color: white;
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 3px solid var(--card); font-size: 12px;
+    }
+
+    .profile-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    .profile-email { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+
+    .stats-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .stat-pill {
+      background: var(--bg); padding: 16px; border-radius: 16px;
+      text-align: center; border: 1px solid var(--border);
+    }
+    .stat-val { display: block; font-size: 18px; font-weight: 800; color: var(--primary); }
+    .stat-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Menu List */
+    .menu-list { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; }
+    .menu-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: 12px;
+      text-decoration: none; color: var(--text-muted);
+      font-size: 14px; font-weight: 600; transition: 0.2s;
+    }
+    .menu-item:hover { background: var(--primary-soft); color: var(--primary); }
+    .menu-item svg { width: 18px; height: 18px; }
+    .menu-item.logout { color: #ef4444; }
+    .menu-item.logout:hover { background: rgba(239, 68, 68, 0.1); }
+
+    /* Main Content Sections */
+    .content-area { display: flex; flex-direction: column; gap: 40px; }
+    .section-head {
       display: flex; align-items: center; justify-content: space-between;
-      transition: all 0.2s; cursor: pointer;
+      margin-bottom: 24px;
     }
-    .resume-card:hover { border-color: var(--blue); transform: translateY(-2px); }
-    
-    .res-info { display: flex; align-items: center; gap: 16px; }
-    .res-icon {
-      width: 48px; height: 48px; background: var(--blue-light);
-      border-radius: 12px; display: flex; align-items: center; justify-content: center;
-      color: var(--blue);
-    }
-    .res-details h4 { font-size: 15px; font-weight: 700; color: var(--text-dark); }
-    .res-details p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .section-head h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
 
-    .badges-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px;
+    /* Resume Cards */
+    .resume-grid { display: grid; gap: 16px; }
+    .resume-strip {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: 0.3s; box-shadow: var(--shadow);
     }
-    .badge-card {
-      padding: 20px; border-radius: 20px; border: 1.5px solid var(--border);
-      text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;
-      background: var(--bg-card); transition: 0.2s;
+    .resume-strip:hover { border-color: var(--primary); transform: translateX(8px); }
+    .res-meta { display: flex; align-items: center; gap: 16px; }
+    .res-icon-box {
+      width: 52px; height: 52px; background: var(--primary-soft);
+      border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      color: var(--primary);
     }
-    .badge-card:hover { border-color: var(--success); }
-    .badge-icon { font-size: 24px; }
-    .badge-name { font-size: 12px; font-weight: 700; color: var(--text-dark); }
+    .res-name { font-size: 15px; font-weight: 700; color: var(--text-main); }
+    .res-tag { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-    .btn-edit {
-      padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--bg-card); color: var(--text-dark); font-size: 12px; font-weight: 600;
-      cursor: pointer; transition: 0.2s;
+    /* Achievement Grid */
+    .badge-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;
     }
-    .btn-edit:hover { background: var(--bg-gray); border-color: var(--muted); }
+    .badge-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 24px; text-align: center;
+      transition: 0.3s; position: relative; overflow: hidden;
+    }
+    .badge-item:hover { transform: translateY(-8px); border-color: var(--accent); }
+    .badge-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+    .badge-title { font-size: 13px; font-weight: 700; }
+    .badge-locked { opacity: 0.4; filter: grayscale(1); }
 
+    /* Buttons */
+    .btn {
+      padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: 0.2s; border: none; font-family: inherit;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: var(--bg); border-color: var(--primary); }
+
+    /* Empty States */
+    .empty-state { text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px; }
+
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+    }
   </style>
 </head>
 <body>
 
 <nav class="top-nav">
   <div class="nav-left">
-    <a href="dashboard.html" class="nav-brand">Hirvo AI</a>
+    <a href="index.html" class="nav-brand">
+      Hirvo AI
+    </a>
     <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">Home</a>
-      <a href="resume-lab.html" class="nav-link">Resume Lab</a>
-      <a href="resume-builder.html" class="nav-link">Resume Builder</a>
-      <a href="profile.html" class="nav-link active">Profile</a>
+      <a href="dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:4px;"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </a>
+      <a href="dashboard.html#recent-simulations" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:4px;"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        Interviews
+      </a>
+      <a href="resume-lab.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:4px;"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+        Resume Lab
+      </a>
+      <a href="resume-builder.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:4px;"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        Resume Builder
+      </a>
+      <a href="profile.html" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; margin-right:4px;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        Profile
+      </a>
     </div>
+  </div>
+
+  <div class="nav-right">
+    <button class="theme-icon-btn" id="theme-toggle" title="Toggle Theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <div style="background:var(--border); width:1px; height:24px;"></div>
+    <a href="login.html" class="nav-link" style="color:var(--error);" onclick="localStorage.clear()">
+       Log Out
+    </a>
+    <a href="profile.html" class="user-pill">
+      <img src="https://ui-avatars.com/api/?name=User&background=eff6ff&color=2563eb&bold=true" id="user-avatar-nav" alt="User Avatar" />
+      <span id="user-name-nav" style="color:var(--text-dark);">User Name</span>
+    </a>
   </div>
 </nav>
 
-<main>
-  <aside class="profile-sidebar">
-    <div class="profile-card">
-      <img id="u-avatar" src="https://ui-avatars.com/api/?name=User&background=eff6ff&color=2563eb&bold=true" class="profile-avatar" alt="Avatar">
-      <h2 id="u-name">User Name</h2>
-      <p id="u-email">user@example.com</p>
-      
-      <div class="profile-stats">
-        <div class="p-stat">
-          <span class="p-stat-val" id="stat-interviews">0</span>
-          <span class="p-stat-label">Interviews</span>
+<div class="container">
+  <aside class="sidebar">
+    <div class="card">
+      <div class="profile-header">
+        <div class="avatar-container">
+          <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=eff6ff&color=2563eb&bold=true" class="avatar" alt="User Avatar">
+          <div class="badge-premium">✓</div>
         </div>
-        <div class="p-stat">
-          <span class="p-stat-val" id="stat-score">0%</span>
-          <span class="p-stat-label">Avg Score</span>
+        <h2 class="profile-name" id="profile-name">Lokesh R</h2>
+        <p class="profile-email" id="u-email">lokesh@example.com</p>
+        
+        <div class="stats-row">
+          <div class="stat-pill">
+            <span class="stat-val" id="stat-interviews">12</span>
+            <span class="stat-label">Interviews</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-val" id="stat-score">92%</span>
+            <span class="stat-label">Avg Accuracy</span>
+          </div>
         </div>
       </div>
-      
-      <button class="btn-edit" style="width:100%; margin-top:24px;">Edit Profile</button>
+
+      <button class="btn btn-primary" style="width: 100%;" onclick="alert('Profile editing coming soon!')">Edit Public Profile</button>
     </div>
 
-    <div class="profile-card" style="text-align:left; padding: 24px;">
-        <h3 style="font-size:14px; margin-bottom:12px;">Settings</h3>
-        <div style="display:flex; flex-direction:column; gap:8px;">
-            <a href="#" class="nav-link" style="padding:4px 0;">Billing & Plans</a>
-            <a href="#" class="nav-link" style="padding:4px 0;">Notification Prefs</a>
-            <a href="#" class="nav-link" style="padding:4px 0; color:var(--error);" onclick="localStorage.clear(); location.href='login.html'">Log Out</a>
-        </div>
+    <div class="card" style="padding: 16px;">
+      <div class="menu-list">
+        <a href="#" class="menu-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+          Billing & Usage
+        </a>
+        <a href="#" class="menu-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          Notifications
+        </a>
+        <a href="#" class="menu-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
+          Account Settings
+        </a>
+        <a href="#" class="menu-item logout" onclick="localStorage.clear(); location.href='login.html'">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Disconnect & Exit
+        </a>
+      </div>
     </div>
   </aside>
 
-  <div class="profile-content">
+  <main class="content-area">
     <section>
-      <div class="section-title">
-        <h3>Resume Library</h3>
-        <button class="btn-edit" onclick="location.href='resume-builder.html'">Create New +</button>
+      <div class="section-head">
+        <h2>Resume Portfolio</h2>
+        <input type="file" id="resume-upload-input" style="display: none;" accept=".pdf" onchange="uploadResume(this)">
+        <button class="btn btn-outline" onclick="document.getElementById('resume-upload-input').click()">+ Add New</button>
       </div>
-      <div id="resume-list" style="display:flex; flex-direction:column; gap:12px;">
-         <!-- Dynamic Resumes -->
-         <div class="resume-card">
-            <div class="res-info">
-                <div class="res-icon">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                </div>
-                <div class="res-details">
-                    <h4>Primary_Resume_2024.pdf</h4>
-                    <p>Analyzed in Resume Lab • 92% ATS Score</p>
-                </div>
-            </div>
-            <button class="btn-edit">View Analysis</button>
-         </div>
+      <div id="resume-list" class="resume-grid">
+        <div class="empty-state">Loading your portfolio...</div>
       </div>
     </section>
 
     <section>
-      <div class="section-title">
-        <h3>Achievement Badges</h3>
+      <div class="section-head">
+        <h2>Achievement Badges</h2>
       </div>
-      <div class="badges-grid">
-        <div class="badge-card">
-           <span class="badge-icon">🚀</span>
-           <span class="badge-name">Early Adopter</span>
+      <div class="badge-grid">
+        <div class="badge-item">
+          <span class="badge-icon">🌟</span>
+          <span class="badge-title">Early Adopter</span>
         </div>
-        <div class="badge-card" style="opacity: 0.5;">
-           <span class="badge-icon">🎯</span>
-           <span class="badge-name">Interview Pro</span>
+        <div class="badge-item badge-locked">
+          <span class="badge-icon">🛡️</span>
+          <span class="badge-title">Interview Hero</span>
         </div>
-        <div class="badge-card" style="opacity: 0.5;">
-           <span class="badge-icon">✍️</span>
-           <span class="badge-name">Resume Master</span>
+        <div class="badge-item badge-locked">
+          <span class="badge-icon">🔥</span>
+          <span class="badge-title">Speed Demon</span>
+        </div>
+        <div class="badge-item badge-locked">
+          <span class="badge-icon">💎</span>
+          <span class="badge-title">ATS Master</span>
         </div>
       </div>
     </section>
 
     <section>
-        <div class="section-title">
-          <h3>Security</h3>
+      <div class="section-head">
+        <h2>Security & Privacy</h2>
+      </div>
+      <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 24px;">
+        <div>
+          <h4 style="font-size: 14px; font-weight: 700;">Password Security</h4>
+          <p style="font-size: 12px; color: var(--text-muted);">Manage your access and secure your account</p>
         </div>
-        <div class="profile-card" style="text-align:left;">
-            <p style="font-size:13px; margin-bottom:16px;">Last password change: 3 months ago</p>
-            <button class="btn-edit">Change Password</button>
-        </div>
+        <button class="btn btn-outline">Change Password</button>
+      </div>
     </section>
-  </div>
-</main>
+  </main>
+</div>
 
 <script>
   window.addEventListener('load', () => {
@@ -259,12 +368,22 @@
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
-    const name = localStorage.getItem('user_name') || 'Guest Candidate';
-    const email = localStorage.getItem('user_email') || 'candidate@example.com';
+    const storedName = localStorage.getItem('user_name') || 'User';
+    let displayName = storedName;
+    if (displayName.includes('@')) {
+      displayName = displayName.split('@')[0];
+      displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+    }
     
-    document.getElementById('u-name').textContent = name;
-    document.getElementById('u-email').textContent = email;
-    document.getElementById('u-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=eff6ff&color=2563eb&bold=true`;
+    // Update Header Pill
+    const navName = document.getElementById('user-name-nav');
+    const navAvatar = document.getElementById('user-avatar-nav');
+    if (navName) navName.textContent = displayName;
+    if (navAvatar) navAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=eff6ff&color=2563eb&bold=true`;
+
+    // Update Profile Body
+    document.getElementById('profile-name').textContent = displayName;
+    document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=eff6ff&color=2563eb&bold=true`;
 
     fetchStats();
     fetchResumes();
@@ -285,34 +404,95 @@
             const avg = completed.reduce((acc, curr) => acc + curr.overallScore, 0) / completed.length;
             document.getElementById('stat-score').textContent = `${Math.round(avg)}%`;
         }
-    } catch(e) {}
+    } catch(e) {
+      console.warn("Stats fetch failed.");
+    }
   }
 
   async function fetchResumes() {
-    // Placeholder - replace with actual resume API if available
     const userId = localStorage.getItem('user_email') || 'demo_user';
+    const list = document.getElementById('resume-list');
     try {
         const response = await fetch(`http://localhost:8000/api/resume/all?userId=${userId}`);
         const data = await response.json();
-        const list = document.getElementById('resume-list');
         
         if (data.length > 0) {
             list.innerHTML = data.map(res => `
-                <div class="resume-card">
-                    <div class="res-info">
-                        <div class="res-icon">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <div class="resume-strip">
+                    <div class="res-meta">
+                        <div class="res-icon-box">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>
-                        <div class="res-details">
-                            <h4>${res.filename || 'Generated Resume'}</h4>
-                            <p>Target: ${res.targetJob || 'Software Role'} • Built with AI</p>
+                        <div>
+                            <h4 class="res-name">${res.filename || 'Untitled Resume'}</h4>
+                            <p class="res-tag">${res.analysis?.atsScore ? 'ATS Score: ' + res.analysis.atsScore : 'Built with AI'} • ${new Date(res.createdAt).toLocaleDateString()}</p>
                         </div>
                     </div>
-                    <button class="btn-edit">View Details</button>
+                    <div style="display: flex; gap: 8px;">
+                      <button class="btn btn-outline" style="padding: 6px 14px; font-size: 12px;" onclick="alert('Analysis view coming soon!')">View Analysis</button>
+                      <button class="btn btn-outline logout" style="padding: 6px 14px; font-size: 12px;" onclick="deleteResume('${res._id}')">Remove</button>
+                    </div>
                 </div>
             `).join('');
+        } else {
+            list.innerHTML = '<div class="empty-state">No resumes found. Click "+ Add New" to upload your first resume.</div>';
         }
-    } catch(e) {}
+    } catch(e) {
+        list.innerHTML = '<div class="empty-state">Failed to load resumes.</div>';
+    }
+  }
+
+  async function uploadResume(input) {
+    if (!input.files || !input.files[0]) return;
+    
+    const file = input.files[0];
+    const userId = localStorage.getItem('user_email') || 'demo_user';
+    const list = document.getElementById('resume-list');
+    
+    // Show temporary spinner
+    const originalContent = list.innerHTML;
+    list.innerHTML = `<div class="empty-state">Uploading & Analyzing <strong>${file.name}</strong> with AI...</div>`;
+    
+    const formData = new FormData();
+    formData.append('resume', file);
+    formData.append('userId', userId);
+    
+    try {
+        const response = await fetch('http://localhost:8000/api/resume/upload', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+        if (data.success) {
+            fetchResumes(); // Refresh the list
+        } else {
+            alert("Upload failed: " + data.detail);
+            list.innerHTML = originalContent;
+        }
+    } catch (err) {
+        alert("Network error occurred during upload.");
+        list.innerHTML = originalContent;
+    } finally {
+        input.value = ''; // Reset input
+    }
+  }
+
+  async function deleteResume(id) {
+    if (!confirm("Are you sure you want to remove this resume from your portfolio?")) return;
+    
+    try {
+        const response = await fetch(`http://localhost:8000/api/resume/${id}`, {
+            method: 'DELETE'
+        });
+        const data = await response.json();
+        if (data.success) {
+            fetchResumes(); // Refresh the list
+        } else {
+            alert("Failed to delete resume.");
+        }
+    } catch (err) {
+        alert("Network error during deletion.");
+    }
   }
 </script>
 
